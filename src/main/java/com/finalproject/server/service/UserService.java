@@ -8,7 +8,6 @@ import java.util.Optional;
 @Service
 public interface UserService {
 
-
     Iterable<User> findAll();
     Optional<User> findUserById(Long id);
     void deleteUserById(Long id);
