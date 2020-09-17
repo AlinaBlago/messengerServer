@@ -20,7 +20,7 @@ public class AdminController {
 
     @RequestMapping(value = "/LoadUsersForAdmin" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder LoadUsersForAdmin(Long id, String key){
+    public ResponseEntity.BodyBuilder loadUsersForAdmin(Long id, String key){
 
         Set<String> users = Collections.singleton(messageService.getUserChats(id).toString());
 
@@ -31,5 +31,42 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/deleteUser" , method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity.BodyBuilder deleteUser(Long id , String key){
 
+        if(userService.isUserHaveAccess(id, key)){
+            userService.deleteUserById(id);
+
+            return ResponseEntity.status(HttpStatus.OK);
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT);
+    }
+
+    @RequestMapping(value = "/banUser" , method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity.BodyBuilder banUser(Long id, String key, Long userToBanId){
+
+        if(userService.isUserHaveAccess(id, key)){
+            userService.banUser(userToBanId);
+
+            return ResponseEntity.status(HttpStatus.OK);
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT);
+    }
+
+    @RequestMapping(value = "/unBanUser" , method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity.BodyBuilder unbanUser(Long id, String key, Long userToUnbanId){
+
+        if(userService.isUserHaveAccess(id, key)){
+            userService.unBanUser(userToUnbanId);
+
+            return ResponseEntity.status(HttpStatus.OK);
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT);
+    }
 }

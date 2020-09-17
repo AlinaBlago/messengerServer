@@ -6,6 +6,7 @@ import com.finalproject.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,10 +16,11 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     KeyServiceImpl keyService = new KeyServiceImpl();
+    List<User> userList = (List<User>) userRepository.findAll();
 
     @Override
-    public Iterable<User> findAll() {
-        return userRepository.findAll();
+    public List<User> findAll() {
+        return (List<User>) userRepository.findAll();
     }
 
     @Override
@@ -63,4 +65,20 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByLogin(login);
     }
 
+    public void banUser(Long id){
+
+        userList.forEach(user -> {
+            if(user.getId().equals(id)){
+                user.setBanned(true);
+            }
+        });
+    }
+
+    public void unBanUser(Long id){
+        userList.forEach(user -> {
+            if(user.getId().equals(id)){
+                user.setBanned(false);
+            }
+        });
+    }
 }
