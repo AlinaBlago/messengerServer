@@ -8,20 +8,21 @@ import java.util.Date;
 public class Message extends AbstractEntity {
 
     String body;
-    User id_sender;
-    User id_receiver;
+    User sender;
+    User receiver;
     Date date;
-    Image id_image;
+    Image idImage;
+    boolean isRead;
 
     public Message() {
     }
 
-    public Message(String body, User id_sender, User id_receiver, Date date, Image id_image){
+    public Message(String body, User sender, User receiver, Date date, boolean isRead){
         this.body = body;
-        this.id_sender = id_sender;
-        this.id_receiver = id_receiver;
+        this.sender = sender;
+        this.receiver = receiver;
         this.date = date;
-        this.id_image = id_image;
+        this.isRead = isRead;
     }
 
     @Column(name = "body", nullable = false)
@@ -35,22 +36,22 @@ public class Message extends AbstractEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_sender", nullable = false)
-    public User getId_sender() {
-        return id_sender;
+    public User getSender() {
+        return sender;
     }
 
-    public void setId_sender(User id_sender) {
-        this.id_sender = id_sender;
+    public void setSender(User id_sender) {
+        this.sender = id_sender;
     }
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_receiver", nullable = false)
-    public User getId_receiver() {
-        return id_receiver;
+    public User getReceiver() {
+        return receiver;
     }
 
-    public void setId_receiver(User id_receiver) {
-        this.id_receiver = id_receiver;
+    public void setReceiver(User id_receiver) {
+        this.receiver = id_receiver;
     }
 
     @Column(name = "date", nullable = false)
@@ -64,22 +65,31 @@ public class Message extends AbstractEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_image", nullable = false)
-    public Image getId_image() {
-        return id_image;
+    public Image getIdImage() {
+        return idImage;
     }
 
-    public void setId_image(Image id_image) {
-        this.id_image = id_image;
+    public void setIdImage(Image id_image) {
+        this.idImage = id_image;
+    }
+
+    @Column(name = "is_read", nullable = false)
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 
     @Override
     public String toString() {
         return "Message{" +
                 "body='" + body + '\'' +
-                ", id_sender=" + id_sender +
-                ", id_receiver=" + id_receiver +
+                ", id_sender=" + sender +
+                ", id_receiver=" + receiver +
                 ", date=" + date +
-                ", id_image=" + id_image +
+                ", id_image=" + idImage +
                 '}';
     }
 }

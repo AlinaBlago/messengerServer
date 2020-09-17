@@ -5,6 +5,8 @@ import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService {
@@ -12,6 +14,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    KeyServiceImpl keyService = new KeyServiceImpl();
 
     @Override
     public Iterable<User> findAll() {
@@ -35,13 +38,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findUserByLogin(String login) {
+    public User findUserByLogin(String login) {
         return userRepository.findUserByLogin(login);
     }
 
     @Override
     public User findUserByLoginAndPassword(String login, String password) {
         return userRepository.findUserByLoginAndPassword(login, password);
+    }
+
+    @Override
+    public boolean isUserHaveAccess(Long id, String key) {
+
+        if(keyService.isExistByUserId(id)){
+            if(keyService.getKeyByUserId(id).getKey().equals(key)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isExistByLogin(String login) {
+        return userRepository.existsByLogin(login);
     }
 
 }

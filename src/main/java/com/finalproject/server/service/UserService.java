@@ -12,6 +12,8 @@ public interface UserService {
     Optional<User> findUserById(Long id);
     void deleteUserById(Long id);
     User add(User user);
-    Optional<User> findUserByLogin(String login);
+    User findUserByLogin(String login);
     User findUserByLoginAndPassword(String login, String password);
+    boolean isUserHaveAccess(Long id, String key);
+    boolean isExistByLogin(String login);
 }

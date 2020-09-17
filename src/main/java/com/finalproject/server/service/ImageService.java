@@ -12,4 +12,5 @@ public interface ImageService {
     Optional<Image> findImageById(Long id);
     void deleteImageById(Long id);
     Image add(Image image);
+
 }
