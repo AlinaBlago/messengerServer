@@ -19,7 +19,7 @@ public class AuthorizationController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity.BodyBuilder signUp(String name, String login, String password){
 
-        if(userService.findUserByLogin(login) == null){
+        if(userService.findUserByLogin(login).isEmpty()){
             userService.add(new User(name, login, password, false, false));
 
             return ResponseEntity.status(HttpStatus.OK);
