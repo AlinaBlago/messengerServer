@@ -11,7 +11,6 @@ import java.util.spi.LocaleNameProvider;
 @Repository
 public interface MessageRepository extends CrudRepository<Message, Long> {
 
-    List<Message> getMessagesById_sender(Long id);
     List<Message> getMessagesByReceiverAndReadFalse(Long receiverId);
     List<Message> getMessagesByReceiver_IdAndSender_Id(Long receiverId, Long senderId);
 }

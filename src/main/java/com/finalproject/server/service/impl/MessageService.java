@@ -4,19 +4,23 @@ package com.finalproject.server.service.impl;
 import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.User;
 import com.finalproject.server.repository.MessageRepository;
-import com.finalproject.server.service.MessageService;
+import com.finalproject.server.service.MessageOperations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-public class MessageServiceImpl implements MessageService {
+@Service
+public class MessageService implements MessageOperations {
 
     List<Message> messages = new ArrayList<>();
     List<Message> unreadMessages = new ArrayList<>();
-    UserServiceImpl userService = new UserServiceImpl();
 
-    @Autowired
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
+
+    public MessageService(MessageRepository messageRepository) {
+        this.messageRepository = messageRepository;
+    }
 
     @Override
     public Iterable<Message> findAll() {
@@ -60,11 +64,6 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<Message> getMessagesBySender(Long id) {
-        return messageRepository.getMessagesById_sender(id);
-    }
-
-    @Override
     public List<Message> getNewMessagesByReceiverAndReadFalse(Long receiverId) {
         return messageRepository.getMessagesByReceiverAndReadFalse(receiverId);
     }
@@ -72,6 +71,16 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<Message> getChat(Long receiverId, Long senderId) {
         return messageRepository.getMessagesByReceiver_IdAndSender_Id(receiverId, senderId);
+    }
+
+    @Override
+    public Long save(Message message) {
+        return messageRepository.save(message).getId();
+    }
+
+    @Override
+    public void updateAll(Iterable<Message> messages) {
+        messageRepository.saveAll(messages);
     }
 
 }

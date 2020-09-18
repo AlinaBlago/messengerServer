@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public interface UserService {
+
+public interface UserOperations {
 
     List<User> findAll();
     Optional<User> findUserById(Long id);
@@ -19,4 +19,7 @@ public interface UserService {
     boolean isExistByLogin(String login);
     void banUser(Long id);
     void unBanUser(Long id);
+    Long save(User user);
+    void updateAll(Iterable<User> users);
+
 }

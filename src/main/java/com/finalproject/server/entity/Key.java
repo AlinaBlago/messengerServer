@@ -3,10 +3,11 @@ package com.finalproject.server.entity;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "keys_users")
-public class Key {
+public class Key extends AbstractEntity {
 
     private User userId;
     private String key;
@@ -14,7 +15,6 @@ public class Key {
     public Key() {
     }
 
-    @Id
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", nullable = false)
     public User getUserId() {

@@ -2,21 +2,22 @@ package com.finalproject.server.service.impl;
 
 import com.finalproject.server.entity.User;
 import com.finalproject.server.repository.UserRepository;
-import com.finalproject.server.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.finalproject.server.service.UserOperations;
+import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-public class UserServiceImpl implements UserService {
+@Service
+public class UserService implements UserOperations {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    KeyServiceImpl keyService = new KeyServiceImpl();
-    List<User> userList = (List<User>) userRepository.findAll();
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    KeyService keyService;
 
     @Override
     public List<User> findAll() {
@@ -66,7 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public void banUser(Long id){
-
+        List<User> userList = (List<User>) userRepository.findAll();
         userList.forEach(user -> {
             if(user.getId().equals(id)){
                 user.setBanned(true);
@@ -75,10 +76,21 @@ public class UserServiceImpl implements UserService {
     }
 
     public void unBanUser(Long id){
+        List<User> userList = (List<User>) userRepository.findAll();
         userList.forEach(user -> {
             if(user.getId().equals(id)){
                 user.setBanned(false);
             }
         });
+    }
+
+    @Override
+    public Long save(User user) {
+        return userRepository.save(user).getId();
+    }
+
+    @Override
+    public void updateAll(Iterable<User> users) {
+        userRepository.saveAll(users);
     }
 }

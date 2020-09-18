@@ -2,16 +2,20 @@ package com.finalproject.server.service.impl;
 
 import com.finalproject.server.entity.Image;
 import com.finalproject.server.repository.ImageRepository;
-import com.finalproject.server.repository.UserRepository;
-import com.finalproject.server.service.ImageService;
+import com.finalproject.server.service.ImageOperations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-public class ImageServiceImpl implements ImageService {
+@Service
+public class ImageService implements ImageOperations {
 
-    @Autowired
-    private ImageRepository imageRepository;
+    private final ImageRepository imageRepository;
+
+    public ImageService(ImageRepository imageRepository) {
+        this.imageRepository = imageRepository;
+    }
 
     @Override
     public Iterable<Image> findAll() {
@@ -33,6 +37,15 @@ public class ImageServiceImpl implements ImageService {
         return imageRepository.save(image);
     }
 
+    @Override
+    public Long save(Image image) {
+        return imageRepository.save(image).getId();
+    }
+
+    @Override
+    public void updateAll(Iterable<Image> images) {
+        imageRepository.saveAll(images);
+    }
 
 
 }

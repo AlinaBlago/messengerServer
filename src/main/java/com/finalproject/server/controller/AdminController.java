@@ -1,7 +1,7 @@
 package com.finalproject.server.controller;
 
-import com.finalproject.server.service.impl.MessageServiceImpl;
-import com.finalproject.server.service.impl.UserServiceImpl;
+import com.finalproject.server.service.MessageOperations;
+import com.finalproject.server.service.UserOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,22 +9,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.persistence.EntityManager;
 import java.util.Collections;
 import java.util.Set;
 
 @RestController
 public class AdminController {
-    MessageServiceImpl messageService = new MessageServiceImpl();
-    UserServiceImpl userService = new UserServiceImpl();
+
+    private final MessageOperations messageOperations;
+    private final UserOperations userOperations;
+
+    public AdminController(MessageOperations messageOperations, UserOperations userOperations) {
+        this.messageOperations = messageOperations;
+        this.userOperations = userOperations;
+    }
 
     @RequestMapping(value = "/LoadUsersForAdmin" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity.BodyBuilder loadUsersForAdmin(Long id, String key){
 
-        Set<String> users = Collections.singleton(messageService.getUserChats(id).toString());
+        Set<String> users = Collections.singleton(messageOperations.getUserChats(id).toString());
 
-        userService.findAll().forEach(item -> {
+        userOperations.findAll().forEach(item -> {
             users.add(item.getLogin());
         });
 
@@ -35,8 +40,8 @@ public class AdminController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity.BodyBuilder deleteUser(Long id , String key){
 
-        if(userService.isUserHaveAccess(id, key)){
-            userService.deleteUserById(id);
+        if(userOperations.isUserHaveAccess(id, key)){
+            userOperations.deleteUserById(id);
 
             return ResponseEntity.status(HttpStatus.OK);
         }
@@ -48,8 +53,8 @@ public class AdminController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity.BodyBuilder banUser(Long id, String key, Long userToBanId){
 
-        if(userService.isUserHaveAccess(id, key)){
-            userService.banUser(userToBanId);
+        if(userOperations.isUserHaveAccess(id, key)){
+            userOperations.banUser(userToBanId);
 
             return ResponseEntity.status(HttpStatus.OK);
         }
@@ -59,10 +64,10 @@ public class AdminController {
 
     @RequestMapping(value = "/unBanUser" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder unbanUser(Long id, String key, Long userToUnbanId){
+    public ResponseEntity.BodyBuilder unBanUser(Long id, String key, Long userToUnBanId){
 
-        if(userService.isUserHaveAccess(id, key)){
-            userService.unBanUser(userToUnbanId);
+        if(userOperations.isUserHaveAccess(id, key)){
+            userOperations.unBanUser(userToUnBanId);
 
             return ResponseEntity.status(HttpStatus.OK);
         }

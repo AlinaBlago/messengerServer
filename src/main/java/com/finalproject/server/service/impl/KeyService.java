@@ -3,13 +3,17 @@ package com.finalproject.server.service.impl;
 import com.finalproject.server.entity.Key;
 import com.finalproject.server.entity.User;
 import com.finalproject.server.repository.KeyRepository;
-import com.finalproject.server.service.KeyService;
+import com.finalproject.server.service.KeyOperations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class KeyServiceImpl implements KeyService {
+@Service
+public class KeyService implements KeyOperations {
+    private final KeyRepository keyRepository;
 
-    @Autowired
-    private KeyRepository keyRepository;
+    public KeyService(KeyRepository keyRepository) {
+        this.keyRepository = keyRepository;
+    }
 
     @Override
     public boolean isExistByUserId(Long id) {
@@ -36,5 +40,15 @@ public class KeyServiceImpl implements KeyService {
     @Override
     public Key getKeyByUserId(Long id) {
         return keyRepository.getKeyByUserId(id);
+    }
+
+    @Override
+    public Long save(Key key) {
+        return keyRepository.save(key).getId();
+    }
+
+    @Override
+    public void updateAll(Iterable<Key> keys) {
+        keyRepository.saveAll(keys);
     }
 }
