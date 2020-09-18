@@ -1,4 +1,4 @@
-package com.finalproject.server.customClass;
+package com.finalproject.server.custom_class;
 
 /** Murmur hash 2.0.
  *

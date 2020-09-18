@@ -1,6 +1,6 @@
 package com.finalproject.server.controller;
 
-import com.finalproject.server.customClass.MurmurHash;
+import com.finalproject.server.custom_class.MurmurHash;
 import com.finalproject.server.entity.User;
 import com.finalproject.server.service.KeyOperations;
 import com.finalproject.server.service.UserOperations;

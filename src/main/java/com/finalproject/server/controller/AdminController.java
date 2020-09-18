@@ -23,7 +23,7 @@ public class AdminController {
         this.userOperations = userOperations;
     }
 
-    @RequestMapping(value = "/LoadUsersForAdmin" , method = RequestMethod.GET,
+    @RequestMapping(value = "/loadUsersForAdmin" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity.BodyBuilder loadUsersForAdmin(Long id, String key){
 

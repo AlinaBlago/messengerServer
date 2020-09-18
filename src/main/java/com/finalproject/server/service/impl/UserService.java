@@ -5,10 +5,12 @@ import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService implements UserOperations {
 
     private final UserRepository userRepository;
