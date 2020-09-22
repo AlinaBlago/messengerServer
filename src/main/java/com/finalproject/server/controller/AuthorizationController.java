@@ -43,17 +43,17 @@ public class AuthorizationController {
         User foundedUser = userOperations.findUserByLoginAndPassword(login, password);
 
         if(foundedUser == null){
-            return new ResponseEntity<Integer>(0 , HttpStatus.OK);
+            return new ResponseEntity<Integer>(0, HttpStatus.OK);
         }
 
         if(foundedUser.getName().length() == 0 && foundedUser.getLogin().length() == 0 && foundedUser.getPassword().length() == 0){
-            return new ResponseEntity<Integer>(0 , HttpStatus.OK);
+            return new ResponseEntity<Integer>(0, HttpStatus.OK);
         }
         int userKey = MurmurHash.hash32((login + System.currentTimeMillis()));
 
         keyOperations.registerNewSignUp(foundedUser, Integer.toString(userKey));
 
-        return new ResponseEntity<Integer>(userKey , HttpStatus.OK);
+        return new ResponseEntity<Integer>(userKey, HttpStatus.OK);
     }
 
 }
