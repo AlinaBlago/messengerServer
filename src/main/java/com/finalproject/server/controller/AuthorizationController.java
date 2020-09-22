@@ -34,22 +34,26 @@ public class AuthorizationController {
             return ResponseEntity.status(HttpStatus.OK);
         }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.OK);
     }
 
     @RequestMapping(value = "/login" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder login(String login, String password){
-
+    public ResponseEntity<Integer> login(String login, String password){
         User foundedUser = userOperations.findUserByLoginAndPassword(login, password);
+
+        if(foundedUser == null){
+            return new ResponseEntity<Integer>(0 , HttpStatus.OK);
+        }
+
         if(foundedUser.getName().length() == 0 && foundedUser.getLogin().length() == 0 && foundedUser.getPassword().length() == 0){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Integer>(0 , HttpStatus.OK);
         }
         int userKey = MurmurHash.hash32((login + System.currentTimeMillis()));
 
         keyOperations.registerNewSignUp(foundedUser, Integer.toString(userKey));
 
-        return ResponseEntity.status(HttpStatus.OK);
+        return new ResponseEntity<Integer>(userKey , HttpStatus.OK);
     }
 
 }

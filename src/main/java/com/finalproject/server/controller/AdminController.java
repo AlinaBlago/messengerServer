@@ -25,7 +25,7 @@ public class AdminController {
 
     @RequestMapping(value = "/loadUsersForAdmin" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder loadUsersForAdmin(Long id, String key){
+    public ResponseEntity<Set<String>> loadUsersForAdmin(Long id, String key){
 
         Set<String> users = Collections.singleton(messageOperations.getUserChats(id).toString());
 
@@ -33,7 +33,7 @@ public class AdminController {
             users.add(item.getLogin());
         });
 
-        return ResponseEntity.status(HttpStatus.OK);
+        return new ResponseEntity<Set<String>>(users , HttpStatus.OK);
     }
 
     @RequestMapping(value = "/deleteUser" , method = RequestMethod.GET,
