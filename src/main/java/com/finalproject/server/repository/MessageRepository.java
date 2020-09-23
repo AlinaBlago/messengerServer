@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.spi.LocaleNameProvider;
 
-@Repository
 public interface MessageRepository extends CrudRepository<Message, Long> {
 
     List<Message> getMessagesByReceiverAndReadFalse(Long receiverId);

@@ -22,8 +22,6 @@ public class UserService implements UserOperations, UserDetailsService {
         this.userRepository = userRepository;
     }
 
-    KeyService keyService;
-
     @Override
     public List<User> findAll() {
         return (List<User>) userRepository.findAll();
@@ -55,16 +53,9 @@ public class UserService implements UserOperations, UserDetailsService {
         return userRepository.findUserByLoginAndPassword(login, password);
     }
 
-    @Override
-    public boolean isUserHaveAccess(Long id, String key) {
-
-        if(keyService.isExistByUserId(id)){
-            if(keyService.getKeyByUserId(id).getKey().equals(key)){
-                return true;
-            }
-        }
-        return false;
-    }
+//    @Override
+//    public boolean isUserHaveAccess(Long id, String key) {
+//    }
 
     @Override
     public boolean isExistByLogin(String login) {
