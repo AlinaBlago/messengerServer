@@ -3,6 +3,9 @@ package com.finalproject.server.service.impl;
 import com.finalproject.server.entity.User;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.UserOperations;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -11,7 +14,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class UserService implements UserOperations {
+public class UserService implements UserOperations, UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -94,5 +97,10 @@ public class UserService implements UserOperations {
     @Override
     public void updateAll(Iterable<User> users) {
         userRepository.saveAll(users);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        return null;
     }
 }

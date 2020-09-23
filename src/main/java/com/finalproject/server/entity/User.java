@@ -1,12 +1,15 @@
 package com.finalproject.server.entity;
 
 import org.hibernate.annotations.NaturalId;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,16 +21,19 @@ public class User {
 
     @NaturalId
     @Column(name = "login", nullable = false)
-    String login;
+    String username;
 
     @Column(name = "password", nullable = false)
     String password;
 
+    @Transient
+    private String passwordConfirm;
+
     @Column(name = "is_banned", nullable = false)
     boolean isBanned;
 
-    @Column(name = "is_admin", nullable = false)
-    boolean isAdmin;
+    @Column(name = "enabled")
+    boolean enabled;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id")
@@ -36,12 +42,12 @@ public class User {
     public User() {
     }
 
-    public User(String name, String login, String password, boolean isBanned, boolean isAdmin){
+    public User(String name, String username, String password, boolean isBanned, boolean enabled){
         this.name = name;
-        this.login = login;
+        this.username = username;
         this.password = password;
         this.isBanned = isBanned;
-        this.isAdmin = isAdmin;
+        this.enabled = enabled;
     }
 
     public Long getId() {
@@ -60,12 +66,13 @@ public class User {
         this.name = name;
     }
 
-    public String getLogin() {
-        return login;
+    @Override
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String login) {
+        this.username = login;
     }
 
     public String getPassword() {
@@ -76,6 +83,14 @@ public class User {
         this.password = password;
     }
 
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
+
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
+    }
+
     public boolean isBanned() {
         return isBanned;
     }
@@ -84,12 +99,13 @@ public class User {
         isBanned = banned;
     }
 
-    public boolean isAdmin() {
-        return isAdmin;
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Image getIdImage() {
@@ -104,11 +120,34 @@ public class User {
     public String toString() {
         return "User{" +
                 "name='" + name + '\'' +
-                ", login='" + login + '\'' +
+                ", login='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", isBanned=" + isBanned +
-                ", isAdmin=" + isAdmin +
+                ", isAdmin=" + enabled +
                 ", idImage=" + idImage +
                 '}';
     }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+
+
 }
