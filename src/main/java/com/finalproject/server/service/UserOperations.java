@@ -12,9 +12,6 @@ public interface UserOperations {
     Optional<User> findUserById(Long id);
     void deleteUserById(Long id);
     User add(User user);
-    User findUserByLogin(String login);
-    User findUserByLoginAndPassword(String login, String password);
-//    boolean isUserHaveAccess(Long id, String key);
     boolean isExistByLogin(String login);
     void banUser(Long id);
     void unBanUser(Long id);

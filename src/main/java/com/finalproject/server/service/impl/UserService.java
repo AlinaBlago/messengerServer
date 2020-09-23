@@ -44,20 +44,6 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public User findUserByLogin(String login) {
-        return userRepository.findUserByLogin(login);
-    }
-
-    @Override
-    public User findUserByLoginAndPassword(String login, String password) {
-        return userRepository.findUserByLoginAndPassword(login, password);
-    }
-
-//    @Override
-//    public boolean isUserHaveAccess(Long id, String key) {
-//    }
-
-    @Override
     public boolean isExistByLogin(String login) {
         return userRepository.existsByLogin(login);
     }
@@ -91,7 +77,13 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return null;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return user;
     }
 }
