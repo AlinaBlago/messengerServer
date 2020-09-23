@@ -15,7 +15,7 @@ public interface UserOperations {
     boolean isExistByLogin(String login);
     void banUser(Long id);
     void unBanUser(Long id);
-    Long save(User user);
+    boolean save(User user);
     void updateAll(Iterable<User> users);
 
 }
