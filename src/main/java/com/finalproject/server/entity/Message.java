@@ -5,13 +5,32 @@ import java.util.Date;
 
 @Entity
 @Table(name = "messages")
-public class Message extends AbstractEntity {
+public class Message {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @Column(name = "body", nullable = false)
     String body;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_sender", nullable = false)
     User sender;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_receiver", nullable = false)
     User receiver;
+
+    @Column(name = "date", nullable = false)
     Date date;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_image", nullable = false)
     Image idImage;
+
+    @Column(name = "is_read", nullable = false)
     boolean isRead;
 
     public Message() {
@@ -25,7 +44,14 @@ public class Message extends AbstractEntity {
         this.isRead = isRead;
     }
 
-    @Column(name = "body", nullable = false)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getBody() {
         return body;
     }
@@ -34,8 +60,6 @@ public class Message extends AbstractEntity {
         this.body = body;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_sender", nullable = false)
     public User getSender() {
         return sender;
     }
@@ -44,8 +68,6 @@ public class Message extends AbstractEntity {
         this.sender = id_sender;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_receiver", nullable = false)
     public User getReceiver() {
         return receiver;
     }
@@ -54,7 +76,6 @@ public class Message extends AbstractEntity {
         this.receiver = id_receiver;
     }
 
-    @Column(name = "date", nullable = false)
     public Date getDate() {
         return date;
     }
@@ -63,8 +84,6 @@ public class Message extends AbstractEntity {
         this.date = date;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_image", nullable = false)
     public Image getIdImage() {
         return idImage;
     }
@@ -73,7 +92,6 @@ public class Message extends AbstractEntity {
         this.idImage = id_image;
     }
 
-    @Column(name = "is_read", nullable = false)
     public boolean isRead() {
         return isRead;
     }

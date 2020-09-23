@@ -7,16 +7,32 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "keys_users")
-public class Key extends AbstractEntity {
+public class Key {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user", nullable = false)
     private User userId;
+
+    @NaturalId
+    @Column(name = "key", nullable = false)
     private String key;
 
     public Key() {
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", nullable = false)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public User getUserId() {
         return userId;
     }
@@ -25,8 +41,6 @@ public class Key extends AbstractEntity {
         this.userId = userId;
     }
 
-    @NaturalId
-    @Column(name = "key", nullable = false)
     public String getKey() {
         return key;
     }

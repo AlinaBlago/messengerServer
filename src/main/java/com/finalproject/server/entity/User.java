@@ -6,13 +6,31 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
-public class User extends AbstractEntity {
+public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @Column(name = "name", nullable = false)
     String name;
+
+    @NaturalId
+    @Column(name = "login", nullable = false)
     String login;
+
+    @Column(name = "password", nullable = false)
     String password;
+
+    @Column(name = "is_banned", nullable = false)
     boolean isBanned;
+
+    @Column(name = "is_admin", nullable = false)
     boolean isAdmin;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id")
     Image idImage;
 
     public User() {
@@ -26,7 +44,14 @@ public class User extends AbstractEntity {
         this.isAdmin = isAdmin;
     }
 
-    @Column(name = "name", nullable = false)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
@@ -35,8 +60,6 @@ public class User extends AbstractEntity {
         this.name = name;
     }
 
-    @NaturalId
-    @Column(name = "login", nullable = false)
     public String getLogin() {
         return login;
     }
@@ -45,7 +68,6 @@ public class User extends AbstractEntity {
         this.login = login;
     }
 
-    @Column(name = "password", nullable = false)
     public String getPassword() {
         return password;
     }
@@ -54,7 +76,6 @@ public class User extends AbstractEntity {
         this.password = password;
     }
 
-    @Column(name = "is_banned", nullable = false)
     public boolean isBanned() {
         return isBanned;
     }
@@ -63,7 +84,6 @@ public class User extends AbstractEntity {
         isBanned = banned;
     }
 
-    @Column(name = "is_admin", nullable = false)
     public boolean isAdmin() {
         return isAdmin;
     }
@@ -72,8 +92,6 @@ public class User extends AbstractEntity {
         isAdmin = admin;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id")
     public Image getIdImage() {
         return idImage;
     }

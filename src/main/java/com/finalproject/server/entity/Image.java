@@ -1,13 +1,17 @@
 package com.finalproject.server.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "images")
-public class Image extends AbstractEntity {
+public class Image {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
+
+    @Column(name = "image", nullable = false)
     byte image;
 
     public Image() {
@@ -17,7 +21,14 @@ public class Image extends AbstractEntity {
         this.image = image;
     }
 
-    @Column(name = "image", nullable = false)
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public byte getImage() {
         return image;
     }
