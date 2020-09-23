@@ -1,8 +1,7 @@
 package com.finalproject.server.repository;
 
 import com.finalproject.server.entity.Image;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ImageRepository extends CrudRepository<Image, Long> {
+public interface ImageRepository extends JpaRepository<Image, Long> {
 }

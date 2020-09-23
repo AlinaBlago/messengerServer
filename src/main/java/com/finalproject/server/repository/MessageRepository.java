@@ -1,14 +1,11 @@
 package com.finalproject.server.repository;
 
 import com.finalproject.server.entity.Message;
-import com.finalproject.server.entity.User;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.spi.LocaleNameProvider;
 
-public interface MessageRepository extends CrudRepository<Message, Long> {
+public interface MessageRepository extends JpaRepository<Message, Long> {
 
     List<Message> getMessagesByReceiverAndReadFalse(Long receiverId);
     List<Message> getMessagesByReceiver_IdAndSender_Id(Long receiverId, Long senderId);
