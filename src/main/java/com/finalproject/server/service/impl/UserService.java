@@ -77,22 +77,26 @@ public class UserService implements UserOperations {
     }
 
     @Override
-    public boolean save(User user) {
+    public void save(User user) {
         User userFromDB = userRepository.findByUsername(user.getUsername());
 
         if (userFromDB != null) {
-            return false;
+
         }
 
         user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        return true;
     }
 
     @Override
     public void updateAll(Iterable<User> users) {
         userRepository.saveAll(users);
+    }
+
+    @Override
+    public void update(User user) {
+        userRepository.save(user);
     }
 
     @Override

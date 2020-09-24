@@ -17,7 +17,7 @@ public interface UserOperations extends UserDetailsService {
     User findByPasswordAndLogin(String password, String login);
     void ban(Long id);
     void unBan(Long id);
-    boolean save(User user);
+    void save(User user);
     void updateAll(Iterable<User> users);
-
+    void update(User user);
 }

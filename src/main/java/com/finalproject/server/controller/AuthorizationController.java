@@ -22,10 +22,11 @@ public class AuthorizationController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity.BodyBuilder signUp(String name, String login, String password){
 
-        if(userOperations.loadUserByUsername(login) == null){
+        if(userOperations.findByPasswordAndLogin(password, login) == null){
             User user = new User(name, login, password, false, true);
             userOperations.add(user);
             userOperations.save(user);
+            userOperations.update(user);
 
             return ResponseEntity.status(HttpStatus.OK);
         }
