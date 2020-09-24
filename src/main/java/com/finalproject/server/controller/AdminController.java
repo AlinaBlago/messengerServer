@@ -25,12 +25,12 @@ public class AdminController {
 
     @RequestMapping(value = "/loadUsersForAdmin" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Set<String>> loadUsersForAdmin(Long id, String key){
+    public ResponseEntity<Set<String>> loadUsersForAdmin(String login){
 
-        Set<String> users = Collections.singleton(messageOperations.getUserChats(id).toString());
+        Set<String> users = Collections.singleton(messageOperations.getUserChats(login).toString());
 
         userOperations.findAll().forEach(item -> {
-            users.add(item.getLogin());
+            users.add(item.getUsername());
         });
 
         return new ResponseEntity<Set<String>>(users , HttpStatus.OK);
@@ -38,10 +38,10 @@ public class AdminController {
 
     @RequestMapping(value = "/deleteUser" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder deleteUser(Long id , String key){
+    public ResponseEntity.BodyBuilder deleteUser(Long id, String adminLogin){
 
-        if(userOperations.isUserHaveAccess(id, key)){
-            userOperations.deleteUserById(id);
+        if(userOperations.loadUserByUsername(adminLogin) != null){
+            userOperations.deleteById(id);
 
             return ResponseEntity.status(HttpStatus.OK);
         }
@@ -51,10 +51,10 @@ public class AdminController {
 
     @RequestMapping(value = "/banUser" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder banUser(Long id, String key, Long userToBanId){
+    public ResponseEntity.BodyBuilder banUser(String adminLogin, Long userToBanId){
 
-        if(userOperations.isUserHaveAccess(id, key)){
-            userOperations.banUser(userToBanId);
+        if(userOperations.loadUserByUsername(adminLogin) != null){
+            userOperations.ban(userToBanId);
 
             return ResponseEntity.status(HttpStatus.OK);
         }
@@ -64,10 +64,10 @@ public class AdminController {
 
     @RequestMapping(value = "/unBanUser" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder unBanUser(Long id, String key, Long userToUnBanId){
+    public ResponseEntity.BodyBuilder unBanUser(String adminLogin, Long userToUnBanId){
 
-        if(userOperations.isUserHaveAccess(id, key)){
-            userOperations.unBanUser(userToUnBanId);
+        if(userOperations.loadUserByUsername(adminLogin) != null){
+            userOperations.unBan(userToUnBanId);
 
             return ResponseEntity.status(HttpStatus.OK);
         }

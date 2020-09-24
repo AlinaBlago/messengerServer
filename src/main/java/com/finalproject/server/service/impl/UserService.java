@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class UserService implements UserOperations, UserDetailsService {
+public class UserService implements UserOperations {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -33,13 +33,18 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public Optional<User> findUserById(Long id) {
+    public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
 
     @Override
-    public void deleteUserById(Long id) {
+    public void deleteById(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User findByPasswordAndLogin(String password, String login) {
+        return userRepository.findByUsernameAndPassword(login, password);
     }
 
     @Override
@@ -49,11 +54,11 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public boolean isExistByLogin(String login) {
-        return userRepository.existsByLogin(login);
+    public boolean existByUsername(String login) {
+        return userRepository.existsByUsername(login);
     }
 
-    public void banUser(Long id){
+    public void ban(Long id){
         List<User> userList = (List<User>) userRepository.findAll();
         userList.forEach(user -> {
             if(user.getId().equals(id)){
@@ -62,7 +67,7 @@ public class UserService implements UserOperations, UserDetailsService {
         });
     }
 
-    public void unBanUser(Long id){
+    public void unBan(Long id){
         List<User> userList = (List<User>) userRepository.findAll();
         userList.forEach(user -> {
             if(user.getId().equals(id)){

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -45,18 +46,18 @@ public class MessageService implements MessageOperations {
     }
 
     @Override
-    public Set<User> getUserChats(Long id) {
+    public Set<User> getUserChats(String login) {
         Set<User> usersToReturn = new HashSet<>();
 
         for(Message msg1 : messages){
-            if(msg1.getSender().getId() == id || msg1.getReceiver().getId() == id){
+            if(msg1.getSender().getUsername().equals(login) || msg1.getReceiver().getUsername().equals(login)){
                 usersToReturn.add(msg1.getReceiver());
                 usersToReturn.add(msg1.getSender());
             }
         }
 
         for(Message msg : unreadMessages){
-            if(msg.getSender().getId() == id || msg.getReceiver().getId() == id){
+            if(msg.getSender().getUsername().equals(login) || msg.getReceiver().getUsername().equals(login)){
                 usersToReturn.add(msg.getReceiver());
                 usersToReturn.add(msg.getSender());
             }
@@ -66,8 +67,9 @@ public class MessageService implements MessageOperations {
     }
 
     @Override
-    public List<Message> getNewMessagesByReceiverAndReadFalse(Long receiverId) {
-        return messageRepository.getMessagesByReceiverAndReadFalse(receiverId);
+    public List<Message> getNewMessages(Long receiverId) {
+        List<Message> receiverMessages = messageRepository.getMessagesByReceiver_Id(receiverId);
+        return receiverMessages.stream().filter(message -> message.isRead() == false).collect(Collectors.toList());
     }
 
     @Override

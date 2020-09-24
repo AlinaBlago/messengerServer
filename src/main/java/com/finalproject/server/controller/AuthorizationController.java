@@ -5,9 +5,9 @@ import com.finalproject.server.service.UserOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AuthorizationController {
@@ -22,8 +22,8 @@ public class AuthorizationController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity.BodyBuilder signUp(String name, String login, String password){
 
-        if(userOperations.findUserByLogin(login) == null){
-            User user = new User(name, login, password, false, false);
+        if(userOperations.loadUserByUsername(login) == null){
+            User user = new User(name, login, password, false, true);
             userOperations.add(user);
             userOperations.save(user);
 
@@ -36,7 +36,7 @@ public class AuthorizationController {
     @RequestMapping(value = "/login" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Integer> login(String login, String password) {
-        User foundedUser = userOperations.findUserByLoginAndPassword(login, password);
+        User foundedUser = userOperations.findByPasswordAndLogin(login, password);
 
         if (foundedUser == null) {
             return new ResponseEntity<Integer>(0, HttpStatus.OK);
@@ -46,11 +46,8 @@ public class AuthorizationController {
             return new ResponseEntity<Integer>(0, HttpStatus.OK);
         }
 
+           return new ResponseEntity<Integer>(0, HttpStatus.OK);
 
-        // keyOperations.registerNewSignUp(foundedUser, Integer.toString(userKey));
-
-        //  return new ResponseEntity<Integer>(userKey, HttpStatus.OK);
-        return null;
     }
 
 }

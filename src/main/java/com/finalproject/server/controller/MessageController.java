@@ -25,10 +25,10 @@ public class MessageController {
 
     @RequestMapping(value = "/getUserChats" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder getUserChats(Long id, String key){
+    public ResponseEntity.BodyBuilder getUserChats(String login){
 
-        if(userOperations.isUserHaveAccess(id, key)){
-            Set<User> users = messageOperations.getUserChats(id);
+        if(userOperations.loadUserByUsername(login) != null){
+            Set<User> users = messageOperations.getUserChats(login);
 
             return ResponseEntity.status(HttpStatus.OK);
         }
@@ -38,26 +38,26 @@ public class MessageController {
 
     @RequestMapping(value = "/isUserExists" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder isUserExists(Long senderId, String senderKey, String userLogin){
+    public ResponseEntity.BodyBuilder isUserExists(String senderLogin, String userLogin){
 
-        if(userOperations.isUserHaveAccess(senderId, senderKey)){
-            if(userOperations.isExistByLogin(userLogin)) {
+        if (userOperations.loadUserByUsername(senderLogin) != null)
+            if(userOperations.existByUsername(userLogin)) {
 
                return ResponseEntity.status(HttpStatus.OK);
             }
-        }
 
         return ResponseEntity.status(HttpStatus.CONFLICT);
     }
 
     @RequestMapping(value = "/sendMessage" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder sendMessage(Long senderId, String senderKey, Long receiverId, String message){
+    public ResponseEntity.BodyBuilder sendMessage(Long senderId, String login, Long receiverId, String message){
 
-        Optional<User> sender = userOperations.findUserById(senderId);
-        Optional<User> receiver = userOperations.findUserById(receiverId);
+        Optional<User> sender = userOperations.findById(senderId);
+        Optional<User> receiver = userOperations.findById(receiverId);
 
-        if(userOperations.isUserHaveAccess(senderId, senderKey) && !sender.isEmpty() && !receiver.isEmpty()){
+        if(userOperations.loadUserByUsername(login) != null)
+            if (!sender.isEmpty() && !receiver.isEmpty()) {
             Message message1 = new Message(message, sender.get(), receiver.get(), new Date(System.currentTimeMillis()), false);
             messageOperations.add(message1);
 
@@ -69,10 +69,10 @@ public class MessageController {
 
     @RequestMapping(value = "/haveNewMessages" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder haveNewMessages(Long senderId, String senderKey){
+    public ResponseEntity.BodyBuilder haveNewMessages(Long senderId, String login){
 
-        if(userOperations.isUserHaveAccess(senderId, senderKey)){
-            List<Message> messages = messageOperations.getNewMessagesByReceiverAndReadFalse(senderId);
+        if(userOperations.loadUserByUsername(login) != null) {
+            List<Message> messages = messageOperations.getNewMessages(senderId);
 
             return ResponseEntity.status(HttpStatus.OK);
         }
@@ -82,9 +82,9 @@ public class MessageController {
 
     @RequestMapping(value = "/getChat" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder haveNewMessages(Long idSender, String senderKey, Long idReceiver){
+    public ResponseEntity.BodyBuilder haveNewMessages(Long idSender, String senderLogin, Long idReceiver){
 
-        if(userOperations.isUserHaveAccess(idSender, senderKey)){
+        if(userOperations.loadUserByUsername(senderLogin) != null){
 
             List<Message> messages = messageOperations.getChat(idSender, idReceiver);
 
