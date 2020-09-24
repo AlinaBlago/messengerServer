@@ -18,6 +18,7 @@ public class RoleService implements RoleOperations {
     }
 
 
+
     @Override
     public Optional<Role> findById(Long id) {
         return roleRepository.findById(id);

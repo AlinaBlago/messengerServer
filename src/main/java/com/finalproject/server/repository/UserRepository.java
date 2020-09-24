@@ -1,5 +1,6 @@
 package com.finalproject.server.repository;
 
+import com.finalproject.server.entity.Role;
 import com.finalproject.server.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -25,7 +25,7 @@ public class User implements UserDetails {
     @Column(name = "login", nullable = false)
     String username;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 255)
     String password;
 
     @Transient

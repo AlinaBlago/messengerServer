@@ -12,7 +12,7 @@ public interface UserOperations extends UserDetailsService {
     List<User> findAll();
     Optional<User> findById(Long id);
     void deleteById(Long id);
-    User add(User user);
+    void add(User user);
     boolean existByUsername(String login);
     User findByPasswordAndLogin(String password, String login);
     void ban(Long id);
