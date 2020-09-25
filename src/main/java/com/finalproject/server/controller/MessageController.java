@@ -25,33 +25,33 @@ public class MessageController {
 
     @RequestMapping(value = "/getUserChats" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder getUserChats(String login){
+    public ResponseEntity getUserChats(String login){
 
         if(userOperations.loadUserByUsername(login) != null){
             Set<User> users = messageOperations.getUserChats(login);
 
-            return ResponseEntity.status(HttpStatus.OK);
+            return new  ResponseEntity(HttpStatus.OK);
         }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT);
+        return new  ResponseEntity(HttpStatus.CONFLICT);
     }
 
     @RequestMapping(value = "/isUserExists" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder isUserExists(String senderLogin, String userLogin){
+    public ResponseEntity isUserExists(String senderLogin, String userLogin){
 
         if (userOperations.loadUserByUsername(senderLogin) != null)
             if(userOperations.existByUsername(userLogin)) {
 
-               return ResponseEntity.status(HttpStatus.OK);
+               return new  ResponseEntity(HttpStatus.OK);
             }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT);
+        return new  ResponseEntity(HttpStatus.CONFLICT);
     }
 
     @RequestMapping(value = "/sendMessage" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder sendMessage(Long senderId, String login, Long receiverId, String message){
+    public ResponseEntity sendMessage(Long senderId, String login, Long receiverId, String message){
 
         Optional<User> sender = userOperations.findById(senderId);
         Optional<User> receiver = userOperations.findById(receiverId);
@@ -61,37 +61,37 @@ public class MessageController {
             Message message1 = new Message(message, sender.get(), receiver.get(), new Date(System.currentTimeMillis()), false);
             messageOperations.add(message1);
 
-            return ResponseEntity.status(HttpStatus.OK);
+            return new  ResponseEntity(HttpStatus.OK);
         }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT);
+        return new  ResponseEntity(HttpStatus.CONFLICT);
     }
 
     @RequestMapping(value = "/haveNewMessages" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder haveNewMessages(Long senderId, String login){
+    public ResponseEntity haveNewMessages(Long senderId, String login){
 
         if(userOperations.loadUserByUsername(login) != null) {
             List<Message> messages = messageOperations.getNewMessages(senderId);
 
-            return ResponseEntity.status(HttpStatus.OK);
+            return new  ResponseEntity(HttpStatus.OK);
         }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT);
+        return new  ResponseEntity(HttpStatus.CONFLICT);
     }
 
     @RequestMapping(value = "/getChat" , method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity.BodyBuilder haveNewMessages(Long idSender, String senderLogin, Long idReceiver){
+    public ResponseEntity haveNewMessages(Long idSender, String senderLogin, Long idReceiver){
 
         if(userOperations.loadUserByUsername(senderLogin) != null){
 
             List<Message> messages = messageOperations.getChat(idSender, idReceiver);
 
-            return ResponseEntity.status(HttpStatus.OK);
+            return new  ResponseEntity(HttpStatus.OK);
         }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT);
+        return new  ResponseEntity(HttpStatus.CONFLICT);
     }
 
 }

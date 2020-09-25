@@ -1,6 +1,9 @@
 package com.finalproject.server.controller;
 
 import com.finalproject.server.entity.User;
+import com.finalproject.server.request.LoginRequest;
+import com.finalproject.server.request.LoginResponse;
+import com.finalproject.server.request.SignupRequest;
 import com.finalproject.server.service.RoleOperations;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.http.HttpStatus;
@@ -9,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,43 +28,29 @@ public class AuthorizationController {
         this.roleOperations = roleOperations;
     }
 
-    @RequestMapping(value = "/signUp" , method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Integer> signUp(String name, String login, String password){
-        if(userOperations.findByPasswordAndLogin(password, login) == null){
+    @GetMapping(value = "/signUp", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity signUp(@Valid @RequestBody SignupRequest request) {
+        if (userOperations.findByLogin(request.getLogin()) == null) {
             User user = new User();
-            user.setName(name);
+            user.setName(request.getName());
             user.setRoles(roleOperations.findById(1L).stream().collect(Collectors.toSet()));
-            user.setPassword(bCryptPasswordEncoder.encode(password));
-            user.setUsername(login);
+            user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+            user.setUsername(request.getLogin());
             user.setBanned(false);
             user.setEnabled(true);
             userOperations.add(user);
             userOperations.save(user);
             userOperations.update(user);
-            return new  ResponseEntity<Integer>(0, HttpStatus.OK);
-        } else return new ResponseEntity<Integer>(1, HttpStatus.FORBIDDEN);
+            return new ResponseEntity(HttpStatus.CREATED);
+        } else return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/login" , method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Integer> login(String login, String password) {
-        if (bCryptPasswordEncoder.matches(password, bCryptPasswordEncoder.encode(password))){
-                 return new ResponseEntity<Integer>(0, HttpStatus.OK);
-        } else{
-            return new ResponseEntity<Integer>(1, HttpStatus.OK);
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity login(@Valid @RequestBody LoginRequest request) {
+        if (bCryptPasswordEncoder.matches(request.getPassword(), userOperations.findByLogin(request.getLogin()).getPassword())) {
+            return ResponseEntity.ok("User is logined on");
         }
-
-       // User foundedUser = userOperations.findByPasswordAndLogin(login, password);
-
-//        if (foundedUser == null) {
-//            return new ResponseEntity<Integer>(0, HttpStatus.OK);
-//        }
-//
-//        if (foundedUser.getName().length() == 0 && foundedUser.getUsername().length() == 0 && foundedUser.getPassword().length() == 0) {
-//            return new ResponseEntity<Integer>(0, HttpStatus.OK);
-//        }
-
+            return new ResponseEntity(HttpStatus.CONFLICT);
     }
-
 }
+

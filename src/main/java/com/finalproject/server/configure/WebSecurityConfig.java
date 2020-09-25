@@ -65,7 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/haveNewMessages").hasRole("USER")
                 .antMatchers("/isUserExist").hasRole("USER")
                 .antMatchers("/sendMessage").hasRole("USER")
-
+                .antMatchers("/application").hasRole("USER")
                 //Доступ разрешен всем пользователей
                 .antMatchers("/", "/resources/**").permitAll()
                 //Все остальные страницы требуют аутентификации
