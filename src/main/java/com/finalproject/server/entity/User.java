@@ -21,7 +21,7 @@ public class User implements UserDetails {
     @Column(name = "name", nullable = false)
     String name;
 
-    @NaturalId
+    //@NaturalId
     @Column(name = "login", nullable = false)
     String username;
 
@@ -34,7 +34,7 @@ public class User implements UserDetails {
     @Column(name = "is_banned", nullable = false)
     boolean isBanned;
 
-    @Column(name = "enabled")
+    @Column(name = "enabled", nullable = false)
     boolean enabled;
 
     @OneToOne(fetch = FetchType.LAZY)

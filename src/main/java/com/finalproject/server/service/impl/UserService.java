@@ -1,17 +1,14 @@
 package com.finalproject.server.service.impl;
 
-import com.finalproject.server.entity.Role;
 import com.finalproject.server.entity.User;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,6 +75,7 @@ public class UserService implements UserOperations {
 
     @Override
     public void save(User user) {
+       // user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -89,6 +87,11 @@ public class UserService implements UserOperations {
     @Override
     public void update(User user) {
         userRepository.save(user);
+    }
+
+    @Override
+    public User findByLogin(String login) {
+        return userRepository.findByUsername(login);
     }
 
     @Override
