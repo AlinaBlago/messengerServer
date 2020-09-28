@@ -2,6 +2,7 @@ package com.finalproject.server.service.impl;
 
 import com.finalproject.server.entity.User;
 import com.finalproject.server.repository.UserRepository;
+import com.finalproject.server.security.UserDetailsImpl;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -90,18 +91,10 @@ public class UserService implements UserOperations {
     }
 
     @Override
-    public User findByLogin(String login) {
-        return userRepository.findByUsername(login);
-    }
-
-    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-
-        return user;
+        return UserDetailsImpl.build(user);
     }
 }
