@@ -15,6 +15,7 @@ public interface UserOperations {
     void add(User user);
     boolean existByUsername(String login);
     User findByPasswordAndLogin(String password, String login);
+    Optional<User> findByUsername(String username);
     void ban(Long id);
     void unBan(Long id);
     void save(User user);

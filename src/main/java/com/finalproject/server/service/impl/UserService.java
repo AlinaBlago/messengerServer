@@ -46,6 +46,11 @@ public class UserService implements UserOperations {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
     public void add(User user) {
         userRepository.save(user);
 
@@ -93,5 +98,7 @@ public class UserService implements UserOperations {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
+
 
 }

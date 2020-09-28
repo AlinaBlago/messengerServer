@@ -3,6 +3,8 @@ package com.finalproject.server.controller;
 import com.finalproject.server.entity.ERole;
 import com.finalproject.server.entity.Role;
 import com.finalproject.server.entity.User;
+import com.finalproject.server.mail.MailService;
+import com.finalproject.server.payload.request.ChangePasswordRequest;
 import com.finalproject.server.payload.request.LoginRequest;
 import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.payload.response.JwtResponse;
@@ -11,7 +13,6 @@ import com.finalproject.server.security.UserDetailsImpl;
 import com.finalproject.server.security.jwt.JwtUtils;
 import com.finalproject.server.service.RoleOperations;
 import com.finalproject.server.service.UserOperations;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +25,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,16 +39,18 @@ public class AuthorizationController {
     private final RoleOperations roleOperations;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final MailService mailService;
 
-    public AuthorizationController(UserOperations userOperations, BCryptPasswordEncoder bCryptPasswordEncoder, RoleOperations roleOperations, AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
+    public AuthorizationController(UserOperations userOperations, BCryptPasswordEncoder bCryptPasswordEncoder, RoleOperations roleOperations, AuthenticationManager authenticationManager, JwtUtils jwtUtils, MailService mailService) {
         this.userOperations = userOperations;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.roleOperations = roleOperations;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
+        this.mailService = mailService;
     }
 
-    @GetMapping(value = "/signUp", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/signUp", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> signUp(@Valid @RequestBody SignupRequest request) {
 //        if (userOperations.findByLogin(request.getLogin()) == null) {
 //            User user = new User();
@@ -73,7 +78,6 @@ public class AuthorizationController {
                         .body(new MessageResponse("Error: Email is already in use!"));
             }
 
-            // Create new user's account
             User user = new User(request.getUsername(),
                     request.getEmail(),
                     bCryptPasswordEncoder.encode(request.getPassword()),
@@ -133,5 +137,26 @@ public class AuthorizationController {
                 userDetails.getEmail(),
                 roles));
     }
+
+    @PostMapping(value = "/changePassword", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+
+        if (!userOperations.existByUsername(request.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: this username doesn't exist!"));
+        } else {
+            mailService.sendSimpleMessage(userOperations.findByUsername(request.getUsername()).get().getEmail(), "Your personal token for changing password", "1234");
+            Optional<User> user = userOperations.findByUsername(request.getUsername());
+            user.get().setPassword(request.getNewPassword());
+            userOperations.save(user.get());
+
+            return ResponseEntity.ok(userOperations.findByUsername(request.getUsername()).get().getEmail());
+        }
+
+    }
+
+
+
 }
 
