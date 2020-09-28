@@ -1,6 +1,4 @@
-package com.finalproject.server.request;
-
-import java.util.Objects;
+package com.finalproject.server.payload.response;
 
 public class LoginResponse {
     private String login;

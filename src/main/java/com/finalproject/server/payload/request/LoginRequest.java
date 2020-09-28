@@ -1,4 +1,4 @@
-package com.finalproject.server.request;
+package com.finalproject.server.payload.request;
 
 import javax.validation.constraints.NotBlank;
 

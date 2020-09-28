@@ -1,6 +1,7 @@
-package com.finalproject.server.request;
+package com.finalproject.server.payload.request;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Set;
 
 public class SignupRequest {
     @NotBlank
@@ -9,6 +10,8 @@ public class SignupRequest {
     private String login;
     @NotBlank
     private String password;
+
+    private Set<String> role;
 
     public SignupRequest() {}
 
@@ -40,5 +43,13 @@ public class SignupRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Set<String> getRole() {
+        return role;
+    }
+
+    public void setRole(Set<String> role) {
+        this.role = role;
     }
 }

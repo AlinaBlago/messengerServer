@@ -1,9 +1,8 @@
 package com.finalproject.server.controller;
 
 import com.finalproject.server.entity.User;
-import com.finalproject.server.request.LoginRequest;
-import com.finalproject.server.request.LoginResponse;
-import com.finalproject.server.request.SignupRequest;
+import com.finalproject.server.payload.request.LoginRequest;
+import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.service.RoleOperations;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.http.HttpStatus;
