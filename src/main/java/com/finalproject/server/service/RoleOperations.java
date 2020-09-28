@@ -10,5 +10,5 @@ public interface RoleOperations {
     void deleteById(Long id);
     Long save(Role role);
     void updateAll(Iterable<Role> roles);
-    Role findByName(ERole name);
+    Optional<Role> findByName(ERole name);
 }

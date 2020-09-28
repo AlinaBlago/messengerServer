@@ -20,5 +20,5 @@ public interface UserOperations extends UserDetailsService {
     void save(User user);
     void updateAll(Iterable<User> users);
     void update(User user);
-
+    boolean existsByEmail(String email);
 }

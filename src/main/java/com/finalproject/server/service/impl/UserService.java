@@ -76,7 +76,6 @@ public class UserService implements UserOperations {
 
     @Override
     public void save(User user) {
-       // user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
 
@@ -88,6 +87,11 @@ public class UserService implements UserOperations {
     @Override
     public void update(User user) {
         userRepository.save(user);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     @Override

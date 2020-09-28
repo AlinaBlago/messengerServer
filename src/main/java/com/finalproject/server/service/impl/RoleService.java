@@ -39,7 +39,7 @@ public class RoleService implements RoleOperations {
     }
 
     @Override
-    public Role findByName(ERole name) {
+    public Optional<Role> findByName(ERole name) {
         return roleRepository.findByName(name);
     }
 }

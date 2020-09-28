@@ -1,13 +1,15 @@
 package com.finalproject.server.payload.request;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
 public class SignupRequest {
     @NotBlank
-    private String name;
+    @Email
+    private String email;
     @NotBlank
-    private String login;
+    private String username;
     @NotBlank
     private String password;
 
@@ -15,26 +17,26 @@ public class SignupRequest {
 
     public SignupRequest() {}
 
-    public SignupRequest(@NotBlank String name, @NotBlank String login, @NotBlank String password) {
-        this.name = name;
-        this.login = login;
+    public SignupRequest(@NotBlank String email, @NotBlank String username, @NotBlank String password) {
+        this.email = email;
+        this.username = username;
         this.password = password;
     }
 
-    public String getName() {
-        return name;
+    public String getEmail() {
+        return email;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

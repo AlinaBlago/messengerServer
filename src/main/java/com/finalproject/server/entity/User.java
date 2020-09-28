@@ -1,11 +1,9 @@
 package com.finalproject.server.entity;
 
 import org.hibernate.annotations.NaturalId;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
+import javax.validation.constraints.Email;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,8 +16,10 @@ public class User {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    String name;
+    @NaturalId
+    @Email
+    @Column(name = "email", nullable = false)
+    String email;
 
     //@NaturalId
     @Column(name = "login", nullable = false)
@@ -52,12 +52,11 @@ public class User {
     public User() {
     }
 
-    public User(String name, String username, String password, boolean isBanned, boolean enabled){
-        this.name = name;
+    public User(String email, String username, String password, boolean isBanned){
+        this.email = email;
         this.username = username;
         this.password = password;
         this.isBanned = isBanned;
-        this.enabled = enabled;
     }
 
     public Long getId() {
@@ -68,12 +67,12 @@ public class User {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getEmail() {
+        return email;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEmail(String name) {
+        this.email = name;
     }
 
     public String getUsername() {
@@ -108,10 +107,9 @@ public class User {
         isBanned = banned;
     }
 
-//    @Override
-//    public boolean isEnabled() {
-//        return enabled;
-//    }
+    public boolean isEnabled() {
+        return enabled;
+    }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
@@ -136,7 +134,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "name='" + name + '\'' +
+                "email='" + email + '\'' +
                 ", login='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", isBanned=" + isBanned +
@@ -144,27 +142,5 @@ public class User {
                 ", idImage=" + idImage +
                 '}';
     }
-
-//    @Override
-//    public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return null;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonExpired() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isAccountNonLocked() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isCredentialsNonExpired() {
-//        return false;
-//    }
-
-
 
 }
