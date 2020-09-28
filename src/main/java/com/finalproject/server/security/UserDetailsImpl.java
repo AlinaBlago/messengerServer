@@ -1,4 +1,4 @@
-package com.finalproject.server.service.impl;
+package com.finalproject.server.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
