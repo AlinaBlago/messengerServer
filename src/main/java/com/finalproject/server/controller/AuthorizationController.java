@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/api/auth")
 public class AuthorizationController {
 
     private final UserOperations userOperations;
