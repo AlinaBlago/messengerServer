@@ -1,5 +1,7 @@
 package com.finalproject.server.service.impl;
 
+import com.finalproject.server.entity.EState;
+import com.finalproject.server.entity.State;
 import com.finalproject.server.entity.User;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.security.UserDetailsImpl;
@@ -10,8 +12,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -62,21 +66,21 @@ public class UserService implements UserOperations {
     }
 
     public void ban(Long id){
-        List<User> userList = (List<User>) userRepository.findAll();
-        userList.forEach(user -> {
-            if(user.getId().equals(id)){
-                user.setBanned(true);
-            }
-        });
+//        List<User> userList = (List<User>) userRepository.findAll();
+//        userList.forEach(user -> {
+//            if(user.getId().equals(id)){
+//                user.setStates(locked);
+//            }
+//        });
     }
 
     public void unBan(Long id){
-        List<User> userList = (List<User>) userRepository.findAll();
-        userList.forEach(user -> {
-            if(user.getId().equals(id)){
-                user.setBanned(false);
-            }
-        });
+//        List<User> userList = (List<User>) userRepository.findAll();
+//        userList.forEach(user -> {
+//            if(user.getId().equals(id)){
+//                user.setStates(active);
+//            }
+//        });
     }
 
     @Override

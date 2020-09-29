@@ -15,6 +15,8 @@ public class SignupRequest {
 
     private Set<String> role;
 
+    private Set<String> state;
+
     public SignupRequest() {}
 
     public SignupRequest(@NotBlank String email, @NotBlank String username, @NotBlank String password) {
@@ -53,5 +55,13 @@ public class SignupRequest {
 
     public void setRole(Set<String> role) {
         this.role = role;
+    }
+
+    public Set<String> getState() {
+        return state;
+    }
+
+    public void setState(Set<String> state) {
+        this.state = state;
     }
 }

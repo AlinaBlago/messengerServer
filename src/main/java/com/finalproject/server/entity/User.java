@@ -21,7 +21,7 @@ public class User {
     @Column(name = "email", nullable = false)
     String email;
 
-    //@NaturalId
+    @NaturalId
     @Column(name = "login", nullable = false)
     String username;
 
@@ -30,9 +30,6 @@ public class User {
 
     @Transient
     private String passwordConfirm;
-
-    @Column(name = "is_banned", nullable = false)
-    boolean isBanned;
 
     @Column(name = "enabled", nullable = false)
     boolean enabled;
@@ -49,14 +46,29 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_states",
+            joinColumns = @JoinColumn(name = "id_user"),
+            inverseJoinColumns = @JoinColumn(name = "id_state")
+    )
+    private Set<State> states = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_tokens",
+            joinColumns = @JoinColumn(name = "id_user"),
+            inverseJoinColumns = @JoinColumn(name = "id_token")
+    )
+    private Set<Token> tokens = new HashSet<>();
+
     public User() {
     }
 
-    public User(String email, String username, String password, boolean isBanned){
+    public User(String email, String username, String password){
         this.email = email;
         this.username = username;
         this.password = password;
-        this.isBanned = isBanned;
     }
 
     public Long getId() {
@@ -99,14 +111,6 @@ public class User {
         this.passwordConfirm = passwordConfirm;
     }
 
-    public boolean isBanned() {
-        return isBanned;
-    }
-
-    public void setBanned(boolean banned) {
-        isBanned = banned;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
@@ -131,13 +135,28 @@ public class User {
         this.roles = roles;
     }
 
+    public Set<State> getStates() {
+        return states;
+    }
+
+    public void setStates(Set<State> states) {
+        this.states = states;
+    }
+
+    public Set<Token> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(Set<Token> tokens) {
+        this.tokens = tokens;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "email='" + email + '\'' +
                 ", login='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", isBanned=" + isBanned +
                 ", isAdmin=" + enabled +
                 ", idImage=" + idImage +
                 '}';
