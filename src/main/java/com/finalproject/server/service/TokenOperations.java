@@ -1,7 +1,7 @@
 package com.finalproject.server.service;
 
-import com.finalproject.server.entity.EToken;
 import com.finalproject.server.entity.Token;
+import com.finalproject.server.entity.User;
 
 import java.util.Optional;
 
@@ -10,6 +10,7 @@ public interface TokenOperations {
     void deleteById(Long id);
     Long save(Token token);
     void updateAll(Iterable<Token> tokens);
-    Optional<Token> findByName(EToken token);
-    Optional<Token> findByNameAndValue(EToken token, String value);
+    void add(Token token);
+    Token findByValue(String value);
+    Optional<Token> findByValueAndUser(String token, User user);
 }

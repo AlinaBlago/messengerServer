@@ -10,7 +10,6 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -28,15 +27,9 @@ public class User {
     @Column(name = "password", nullable = false, length = 255)
     String password;
 
-    @Transient
-    private String passwordConfirm;
 
     @Column(name = "enabled", nullable = false)
     boolean enabled;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id")
-    Image idImage;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
@@ -53,14 +46,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "id_state")
     )
     private Set<State> states = new HashSet<>();
-
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "users_tokens",
-            joinColumns = @JoinColumn(name = "id_user"),
-            inverseJoinColumns = @JoinColumn(name = "id_token")
-    )
-    private Set<Token> tokens = new HashSet<>();
 
     public User() {
     }
@@ -103,28 +88,12 @@ public class User {
         this.password = password;
     }
 
-    public String getPasswordConfirm() {
-        return passwordConfirm;
-    }
-
-    public void setPasswordConfirm(String passwordConfirm) {
-        this.passwordConfirm = passwordConfirm;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public Image getIdImage() {
-        return idImage;
-    }
-
-    public void setIdImage(Image idImage) {
-        this.idImage = idImage;
     }
 
     public Set<Role> getRoles() {
@@ -143,13 +112,6 @@ public class User {
         this.states = states;
     }
 
-    public Set<Token> getTokens() {
-        return tokens;
-    }
-
-    public void setTokens(Set<Token> tokens) {
-        this.tokens = tokens;
-    }
 
     @Override
     public String toString() {
@@ -158,7 +120,6 @@ public class User {
                 ", login='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", isAdmin=" + enabled +
-                ", idImage=" + idImage +
                 '}';
     }
 

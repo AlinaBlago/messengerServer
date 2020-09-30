@@ -7,6 +7,7 @@ import com.finalproject.server.payload.request.SendChangePasswordTokenRequest;
 import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.payload.response.JwtResponse;
 import com.finalproject.server.payload.response.MessageResponse;
+import com.finalproject.server.security.UserDetailsImpl;
 import com.finalproject.server.security.jwt.JwtUtils;
 import com.finalproject.server.security.token.CustomToken;
 import com.finalproject.server.service.RoleOperations;
@@ -135,7 +136,16 @@ public class AuthorizationController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        return ResponseEntity.ok(new JwtResponse(jwt));
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new JwtResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles));
     }
 
 }

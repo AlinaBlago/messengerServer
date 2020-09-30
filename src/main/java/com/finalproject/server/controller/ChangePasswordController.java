@@ -11,45 +11,41 @@ import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 public class ChangePasswordController {
     private final UserOperations userOperations;
     private final MailService mailService;
     private final TokenOperations tokenOperations;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public ChangePasswordController(UserOperations userOperations, MailService mailService, TokenOperations tokenOperations) {
+    public ChangePasswordController(UserOperations userOperations, MailService mailService, TokenOperations tokenOperations, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userOperations = userOperations;
         this.mailService = mailService;
         this.tokenOperations = tokenOperations;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @PostMapping(value = "/sendTokenForChangingPassword", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> sendChangePasswordToken(@RequestBody SendChangePasswordTokenRequest request) {
         String token = CustomToken.getToken();
-        Set<Token> tokens = new HashSet<>();
 
         if (!userOperations.existByUsername(request.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: this username doesn't exist!"));
         } else {
-            Token userToken = tokenOperations.findByName(EToken.CHANGE_PASSWORD_TOKEN)
-                    .orElseThrow(() -> new RuntimeException("Error: Token is not found."));
-            userToken.setValue(token);
-            tokens.add(userToken);
-
             Optional<User> foundedUser = userOperations.findByUsername(request.getUsername());
-            foundedUser.get().setTokens(tokens);
-            userOperations.save(foundedUser.get());
-
+            Token userToken = new Token();
+            userToken.setValue(token);
+            userToken.setUser(foundedUser.get());
+            tokenOperations.add(userToken);
             mailService.sendSimpleMessage(
                     userOperations.findByUsername(request.getUsername()).get().getEmail(),
                     "Your personal token for changing password",
@@ -63,20 +59,17 @@ public class ChangePasswordController {
     @PostMapping(value = "/submitChangingPassword", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         Optional<User> foundedUser = userOperations.findByUsername(request.getUsername());
+        Token token = tokenOperations.findByValue(request.getToken());
 
         if (!userOperations.existByUsername(request.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: this username doesn't exist!"));
-        } else {
-            Token userToken = tokenOperations.findByNameAndValue(EToken.CHANGE_PASSWORD_TOKEN, request.getToken())
-                    .orElseThrow(() -> new RuntimeException("Error: Token is not found."));
-
-            foundedUser.get().setPassword(request.getPassword());
+        } else if (tokenOperations.findByValueAndUser(token.getValue(), foundedUser.get()).isPresent()) {
+            foundedUser.get().setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
             userOperations.update(foundedUser.get());
-
-            return ResponseEntity.ok(" ");
+            tokenOperations.deleteById(tokenOperations.findByValueAndUser(token.getValue(), foundedUser.get()).get().getId());
         }
-
+        return ResponseEntity.ok("Password changed successful");
     }
 }

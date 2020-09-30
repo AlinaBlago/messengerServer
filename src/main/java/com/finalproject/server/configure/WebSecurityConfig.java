@@ -20,10 +20,7 @@ import java.security.SecureRandom;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(
-        // securedEnabled = true,
-        // jsr250Enabled = true,
-        prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthEntryPointJwt unauthorizedHandler;
@@ -58,56 +55,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/login").not().fullyAuthenticated()
-                .antMatchers("/signUp").not().fullyAuthenticated()
-                .antMatchers("/sendTokenForChangingPassword").permitAll()
-                .antMatchers("/submitChangingPassword").permitAll()
-
-
-//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-////                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-////                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-//                .antMatchers("/api/test/**").permitAll()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                .authorizeRequests().antMatchers("/login", "/signUp",
+                "/sendTokenForChangingPassword", "/submitChangingPassword").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
-
-
-//    @Override
-//    protected void configure(HttpSecurity httpSecurity) throws Exception {
-//        httpSecurity
-//                .csrf()
-//                .disable()
-//                .authorizeRequests()
-//                //Доступ только для не зарегистрированных пользователей
-//                .antMatchers("/login").not().fullyAuthenticated()
-//                .antMatchers("/signUp").not().fullyAuthenticated()
-//                //Доступ только для пользователей с ролью Администратор
-//                .antMatchers("/admin/**").hasRole("ADMIN")
-//                .antMatchers("/getChat").hasRole("USER")
-//                .antMatchers("/getUserChats").hasRole("USER")
-//                .antMatchers("/getChat").hasRole("USER")
-//                .antMatchers("/haveNewMessages").hasRole("USER")
-//                .antMatchers("/isUserExist").hasRole("USER")
-//                .antMatchers("/sendMessage").hasRole("USER")
-//                .antMatchers("/application").hasRole("USER")
-//                //Доступ разрешен всем пользователей
-//                .antMatchers("/", "/resources/**").permitAll()
-//                //Все остальные страницы требуют аутентификации
-//                .anyRequest().authenticated()
-//                .and()
-//                //Настройка для входа в систему
-//                .formLogin()
-//                .loginPage("/login")
-//                //Перенарпавление на главную страницу после успешного входа
-//                .defaultSuccessUrl("/")
-//                .permitAll()
-//                .and()
-//                .logout()
-//                .permitAll()
-//                .logoutSuccessUrl("/");
-//    }
-
 }

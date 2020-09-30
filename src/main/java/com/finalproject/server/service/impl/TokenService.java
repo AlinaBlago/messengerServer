@@ -1,7 +1,7 @@
 package com.finalproject.server.service.impl;
 
-import com.finalproject.server.entity.EToken;
 import com.finalproject.server.entity.Token;
+import com.finalproject.server.entity.User;
 import com.finalproject.server.repository.TokenRepository;
 import com.finalproject.server.service.TokenOperations;
 import org.springframework.stereotype.Service;
@@ -39,12 +39,19 @@ public class TokenService implements TokenOperations {
     }
 
     @Override
-    public Optional<Token> findByName(EToken token) {
-        return tokenRepository.findByName(token);
+    public void add(Token token) {
+        tokenRepository.save(token);
     }
 
     @Override
-    public Optional<Token> findByNameAndValue(EToken token, String value) {
-        return tokenRepository.findByNameAndValue(token, value);
+    public Token findByValue(String value) {
+        return tokenRepository.findByValue(value);
     }
+
+    @Override
+    public Optional<Token> findByValueAndUser(String token, User user) {
+        return tokenRepository.findByValueAndUser(token, user);
+    }
+
+
 }

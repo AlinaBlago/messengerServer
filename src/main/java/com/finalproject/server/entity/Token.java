@@ -3,8 +3,6 @@ package com.finalproject.server.entity;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "tokens")
@@ -15,22 +13,18 @@ public class Token {
     private Long id;
 
     @NaturalId
-    @Column(name = "name", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EToken name;
-
     @Column(name = "value", nullable = false)
     private String value;
 
-    @ManyToMany(mappedBy = "tokens")
-    private Set<User> users = new HashSet<User>();
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user", nullable = false)
+    User user;
 
     public Token() {
     }
 
-    public Token(Long id, EToken name, String value){
+    public Token(Long id, String value){
         this.id = id;
-        this.name = name;
         this.value = value;
     }
 
@@ -42,27 +36,19 @@ public class Token {
         this.id = id;
     }
 
-    public EToken getName() {
-        return name;
-    }
-
-    public void setName(EToken name) {
-        this.name = name;
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
-
     public String getValue() {
         return value;
     }
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User id_user) {
+        this.user = id_user;
     }
 }
