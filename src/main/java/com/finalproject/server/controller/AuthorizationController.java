@@ -15,6 +15,7 @@ import com.finalproject.server.service.StateOperations;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -49,6 +50,7 @@ public class AuthorizationController {
         this.jwtUtils = jwtUtils;
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping(value = "/signUp", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> signUp(@Valid @RequestBody SignupRequest request) {
         if (userOperations.existByUsername(request.getUsername())) {
@@ -141,11 +143,8 @@ public class AuthorizationController {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles));
+      //  return ResponseEntity.ok(new JwtResponse(jwt, roles));
+        return ResponseEntity.ok(jwt);
     }
 
 }

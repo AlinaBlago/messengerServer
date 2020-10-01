@@ -4,6 +4,7 @@ import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.User;
 import com.finalproject.server.payload.request.GetUserChatsRequest;
 import com.finalproject.server.payload.request.LoginRequest;
+import com.finalproject.server.security.jwt.JwtUtils;
 import com.finalproject.server.service.MessageOperations;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.http.HttpStatus;
@@ -24,11 +25,11 @@ public class MessageController {
         this.messageOperations = messageOperations;
     }
 
-    @GetMapping(value = "/getUserChats" ,produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getUserChats(@Valid @RequestBody LoginRequest request){
-        System.out.println("ALERLERERMERKER");
-        if(userOperations.findByUsername(request.getUsername()).isPresent()) {
-            Set<User> users = messageOperations.getUserChats(request.getUsername());
+    @PostMapping(value = "/getUserChats")
+    public ResponseEntity<?> getUserChats(@RequestParam GetUserChatsRequest request){
+        JwtUtils utils = new JwtUtils();
+        if(userOperations.findByUsername(utils.getUserNameFromJwtToken(request.getToken())).isPresent()) {
+            Set<User> users = messageOperations.getUserChats(utils.getUserNameFromJwtToken(request.getToken()));
 
             return ResponseEntity.ok("Ok");
         } else return ResponseEntity.ok("Conflict");
