@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class MessengerUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -47,10 +47,10 @@ public class User {
     )
     private Set<State> states = new HashSet<>();
 
-    public User() {
+    public MessengerUser() {
     }
 
-    public User(String email, String username, String password){
+    public MessengerUser(String email, String username, String password){
         this.email = email;
         this.username = username;
         this.password = password;

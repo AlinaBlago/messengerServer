@@ -1,25 +1,22 @@
 package com.finalproject.server.service.impl;
 
-import com.finalproject.server.entity.EState;
-import com.finalproject.server.entity.State;
-import com.finalproject.server.entity.User;
+import com.finalproject.server.entity.ERole;
+import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.repository.UserRepository;
-import com.finalproject.server.security.UserDetailsImpl;
 import com.finalproject.server.service.UserOperations;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
-public class UserService implements UserOperations {
+public class UserService implements UserOperations, UserDetailsService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -30,12 +27,12 @@ public class UserService implements UserOperations {
     }
 
     @Override
-    public List<User> findAll() {
-        return (List<User>) userRepository.findAll();
+    public List<MessengerUser> findAll() {
+        return (List<MessengerUser>) userRepository.findAll();
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<MessengerUser> findById(Long id) {
         return userRepository.findById(id);
     }
 
@@ -45,17 +42,17 @@ public class UserService implements UserOperations {
     }
 
     @Override
-    public User findByPasswordAndLogin(String password, String login) {
+    public MessengerUser findByPasswordAndLogin(String password, String login) {
         return userRepository.findByUsernameAndPassword(login, password);
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
+    public Optional<MessengerUser> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
     @Override
-    public void add(User user) {
+    public void add(MessengerUser user) {
         userRepository.save(user);
 
     }
@@ -84,17 +81,17 @@ public class UserService implements UserOperations {
     }
 
     @Override
-    public void save(User user) {
+    public void save(MessengerUser user) {
         userRepository.save(user);
     }
 
     @Override
-    public void updateAll(Iterable<User> users) {
+    public void updateAll(Iterable<MessengerUser> users) {
         userRepository.saveAll(users);
     }
 
     @Override
-    public void update(User user) {
+    public void update(MessengerUser user) {
         userRepository.save(user);
     }
 
@@ -103,6 +100,17 @@ public class UserService implements UserOperations {
         return userRepository.existsByEmail(email);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        MessengerUser user = userRepository.findByEmailOrNickname(username, username)
+                .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
+
+        Set<ERole> authorities = EnumSet.copyOf(user.getAuthorities().keySet());
+
+        return new User(user.getEmail(), user.getPassword(), authorities);
+    }
 
 
 }

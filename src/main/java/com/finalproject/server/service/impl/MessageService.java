@@ -2,10 +2,9 @@ package com.finalproject.server.service.impl;
 
 
 import com.finalproject.server.entity.Message;
-import com.finalproject.server.entity.User;
+import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.repository.MessageRepository;
 import com.finalproject.server.service.MessageOperations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -46,8 +45,8 @@ public class MessageService implements MessageOperations {
     }
 
     @Override
-    public Set<User> getUserChats(String login) {
-        Set<User> usersToReturn = new HashSet<>();
+    public Set<MessengerUser> getUserChats(String login) {
+        Set<MessengerUser> usersToReturn = new HashSet<>();
 
         for(Message msg1 : messages){
             if(msg1.getSender().getUsername().equals(login) || msg1.getReceiver().getUsername().equals(login)){

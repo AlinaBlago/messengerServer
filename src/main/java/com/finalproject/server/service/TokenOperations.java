@@ -1,7 +1,7 @@
 package com.finalproject.server.service;
 
+import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.entity.Token;
-import com.finalproject.server.entity.User;
 
 import java.util.Optional;
 
@@ -12,5 +12,5 @@ public interface TokenOperations {
     void updateAll(Iterable<Token> tokens);
     void add(Token token);
     Token findByValue(String value);
-    Optional<Token> findByValueAndUser(String token, User user);
+    Optional<Token> findByValueAndUser(String token, MessengerUser messengerUser);
 }

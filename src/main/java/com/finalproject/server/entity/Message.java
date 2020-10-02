@@ -17,11 +17,11 @@ public class Message {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_sender", nullable = false)
-    User sender;
+    MessengerUser sender;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_receiver", nullable = false)
-    User receiver;
+    MessengerUser receiver;
 
     @Column(name = "date", nullable = false)
     Date date;
@@ -36,7 +36,7 @@ public class Message {
     public Message() {
     }
 
-    public Message(String body, User sender, User receiver, Date date, boolean isRead){
+    public Message(String body, MessengerUser sender, MessengerUser receiver, Date date, boolean isRead){
         this.body = body;
         this.sender = sender;
         this.receiver = receiver;
@@ -60,19 +60,19 @@ public class Message {
         this.body = body;
     }
 
-    public User getSender() {
+    public MessengerUser getSender() {
         return sender;
     }
 
-    public void setSender(User id_sender) {
+    public void setSender(MessengerUser id_sender) {
         this.sender = id_sender;
     }
 
-    public User getReceiver() {
+    public MessengerUser getReceiver() {
         return receiver;
     }
 
-    public void setReceiver(User id_receiver) {
+    public void setReceiver(MessengerUser id_receiver) {
         this.receiver = id_receiver;
     }
 

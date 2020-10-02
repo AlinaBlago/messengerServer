@@ -1,15 +1,11 @@
 package com.finalproject.server.controller;
 
 import com.finalproject.server.entity.*;
-import com.finalproject.server.mail.MailService;
 import com.finalproject.server.payload.request.LoginRequest;
-import com.finalproject.server.payload.request.SendChangePasswordTokenRequest;
 import com.finalproject.server.payload.request.SignupRequest;
-import com.finalproject.server.payload.response.JwtResponse;
 import com.finalproject.server.payload.response.MessageResponse;
 import com.finalproject.server.security.UserDetailsImpl;
 import com.finalproject.server.security.jwt.JwtUtils;
-import com.finalproject.server.security.token.CustomToken;
 import com.finalproject.server.service.RoleOperations;
 import com.finalproject.server.service.StateOperations;
 import com.finalproject.server.service.UserOperations;
@@ -24,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,7 +60,7 @@ public class AuthorizationController {
                     .body(new MessageResponse("Error: Email is already in use!"));
         }
 
-        User user = new User(
+        MessengerUser messengerUser = new MessengerUser(
                 request.getEmail(),
                 request.getUsername(),
                 bCryptPasswordEncoder.encode(request.getPassword())
@@ -121,9 +116,9 @@ public class AuthorizationController {
             });
         }
 
-        user.setRoles(roles);
-        user.setStates(states);
-        userOperations.save(user);
+        messengerUser.setRoles(roles);
+        messengerUser.setStates(states);
+        userOperations.save(messengerUser);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }

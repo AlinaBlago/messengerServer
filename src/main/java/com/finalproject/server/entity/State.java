@@ -20,7 +20,7 @@ public class State {
     private EState name;
 
     @ManyToMany(mappedBy = "states")
-    private Set<User> users = new HashSet<User>();
+    private Set<MessengerUser> messengerUsers = new HashSet<MessengerUser>();
 
     public State() {
     }
@@ -46,12 +46,12 @@ public class State {
         this.name = name;
     }
 
-    public Set<User> getUsers() {
-        return users;
+    public Set<MessengerUser> getMessengerUsers() {
+        return messengerUsers;
     }
 
-    public void setUsers(Set<User> users) {
-        this.users = users;
+    public void setMessengerUsers(Set<MessengerUser> messengerUsers) {
+        this.messengerUsers = messengerUsers;
     }
 
     @Override

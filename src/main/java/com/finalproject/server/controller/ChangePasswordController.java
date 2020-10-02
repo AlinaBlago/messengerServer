@@ -41,10 +41,10 @@ public class ChangePasswordController {
                     .badRequest()
                     .body(new MessageResponse("Error: this username doesn't exist!"));
         } else {
-            Optional<User> foundedUser = userOperations.findByUsername(request.getUsername());
+            Optional<MessengerUser> foundedUser = userOperations.findByUsername(request.getUsername());
             Token userToken = new Token();
             userToken.setValue(token);
-            userToken.setUser(foundedUser.get());
+            userToken.setMessengerUser(foundedUser.get());
             tokenOperations.add(userToken);
             mailService.sendSimpleMessage(
                     userOperations.findByUsername(request.getUsername()).get().getEmail(),
@@ -58,7 +58,7 @@ public class ChangePasswordController {
 
     @PostMapping(value = "/submitChangingPassword", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
-        Optional<User> foundedUser = userOperations.findByUsername(request.getUsername());
+        Optional<MessengerUser> foundedUser = userOperations.findByUsername(request.getUsername());
         Token token = tokenOperations.findByValue(request.getToken());
 
         if (!userOperations.existByUsername(request.getUsername())) {

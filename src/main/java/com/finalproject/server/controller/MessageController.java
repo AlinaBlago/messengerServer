@@ -1,9 +1,8 @@
 package com.finalproject.server.controller;
 
 import com.finalproject.server.entity.Message;
-import com.finalproject.server.entity.User;
+import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.payload.request.GetUserChatsRequest;
-import com.finalproject.server.payload.request.LoginRequest;
 import com.finalproject.server.security.jwt.JwtUtils;
 import com.finalproject.server.service.MessageOperations;
 import com.finalproject.server.service.UserOperations;
@@ -12,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.*;
 
 @RestController
@@ -29,7 +27,7 @@ public class MessageController {
     public ResponseEntity<?> getUserChats(@RequestParam GetUserChatsRequest request){
         JwtUtils utils = new JwtUtils();
         if(userOperations.findByUsername(utils.getUserNameFromJwtToken(request.getToken())).isPresent()) {
-            Set<User> users = messageOperations.getUserChats(utils.getUserNameFromJwtToken(request.getToken()));
+            Set<MessengerUser> messengerUsers = messageOperations.getUserChats(utils.getUserNameFromJwtToken(request.getToken()));
 
             return ResponseEntity.ok("Ok");
         } else return ResponseEntity.ok("Conflict");
@@ -52,8 +50,8 @@ public class MessageController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity sendMessage(Long senderId, String login, Long receiverId, String message){
 
-        Optional<User> sender = userOperations.findById(senderId);
-        Optional<User> receiver = userOperations.findById(receiverId);
+        Optional<MessengerUser> sender = userOperations.findById(senderId);
+        Optional<MessengerUser> receiver = userOperations.findById(receiverId);
 
         if(userOperations.findByUsername(login).isPresent())
             if (!sender.isEmpty() && !receiver.isEmpty()) {

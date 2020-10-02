@@ -19,7 +19,7 @@ public class Role implements GrantedAuthority {
     private ERole name;
 
     @ManyToMany(mappedBy = "roles")
-    private Set<User> users = new HashSet<User>();
+    private Set<MessengerUser> messengerUsers = new HashSet<MessengerUser>();
 
     public Role() {
     }
@@ -49,12 +49,12 @@ public class Role implements GrantedAuthority {
         this.name = name;
     }
 
-    public Set<User> getGroups() {
-        return users;
+    public Set<MessengerUser> getGroups() {
+        return messengerUsers;
     }
 
-    public void setGroups(Set<User> groups) {
-        this.users = groups;
+    public void setGroups(Set<MessengerUser> groups) {
+        this.messengerUsers = groups;
     }
 
     @Override

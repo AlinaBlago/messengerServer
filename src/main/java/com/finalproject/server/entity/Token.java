@@ -18,7 +18,7 @@ public class Token {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", nullable = false)
-    User user;
+    MessengerUser messengerUser;
 
     public Token() {
     }
@@ -44,11 +44,11 @@ public class Token {
         this.value = value;
     }
 
-    public User getUser() {
-        return user;
+    public MessengerUser getMessengerUser() {
+        return messengerUser;
     }
 
-    public void setUser(User id_user) {
-        this.user = id_user;
+    public void setMessengerUser(MessengerUser id_Messenger_user) {
+        this.messengerUser = id_Messenger_user;
     }
 }

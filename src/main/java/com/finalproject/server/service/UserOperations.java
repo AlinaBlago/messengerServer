@@ -1,7 +1,6 @@
 package com.finalproject.server.service;
 
-import com.finalproject.server.entity.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import com.finalproject.server.entity.MessengerUser;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,17 +8,17 @@ import java.util.Optional;
 
 public interface UserOperations {
 
-    List<User> findAll();
-    Optional<User> findById(Long id);
+    List<MessengerUser> findAll();
+    Optional<MessengerUser> findById(Long id);
     void deleteById(Long id);
-    void add(User user);
+    void add(MessengerUser messengerUser);
     boolean existByUsername(String login);
-    User findByPasswordAndLogin(String password, String login);
-    Optional<User> findByUsername(String username);
+    MessengerUser findByPasswordAndLogin(String password, String login);
+    Optional<MessengerUser> findByUsername(String username);
     void ban(Long id);
     void unBan(Long id);
-    void save(User user);
-    void updateAll(Iterable<User> users);
-    void update(User user);
+    void save(MessengerUser messengerUser);
+    void updateAll(Iterable<MessengerUser> users);
+    void update(MessengerUser messengerUser);
     boolean existsByEmail(String email);
 }
