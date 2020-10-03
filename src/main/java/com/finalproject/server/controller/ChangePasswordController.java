@@ -6,6 +6,7 @@ import com.finalproject.server.payload.request.ChangePasswordRequest;
 import com.finalproject.server.payload.request.SendChangePasswordTokenRequest;
 import com.finalproject.server.payload.response.ChangePasswordResponse;
 import com.finalproject.server.payload.response.MessageResponse;
+import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.security.token.CustomToken;
 import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
@@ -20,13 +21,13 @@ import java.util.Optional;
 
 @RestController
 public class ChangePasswordController {
-    private final UserOperations userOperations;
+    private final UserRepository userRepository;
     private final MailService mailService;
     private final TokenOperations tokenOperations;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public ChangePasswordController(UserOperations userOperations, MailService mailService, TokenOperations tokenOperations, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userOperations = userOperations;
+    public ChangePasswordController(UserRepository userRepository, MailService mailService, TokenOperations tokenOperations, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userRepository = userRepository;
         this.mailService = mailService;
         this.tokenOperations = tokenOperations;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -36,18 +37,18 @@ public class ChangePasswordController {
     public ResponseEntity<?> sendChangePasswordToken(@RequestBody SendChangePasswordTokenRequest request) {
         String token = CustomToken.getToken();
 
-        if (!userOperations.existByUsername(request.getUsername())) {
+        if (!userRepository.existsByUsername(request.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: this username doesn't exist!"));
         } else {
-            Optional<MessengerUser> foundedUser = userOperations.findByUsername(request.getUsername());
+            Optional<MessengerUser> foundedUser = userRepository.findByUsername(request.getUsername());
             Token userToken = new Token();
             userToken.setValue(token);
             userToken.setMessengerUser(foundedUser.get());
             tokenOperations.add(userToken);
             mailService.sendSimpleMessage(
-                    userOperations.findByUsername(request.getUsername()).get().getEmail(),
+                    userRepository.findByUsername(request.getUsername()).get().getEmail(),
                     "Your personal token for changing password",
                     token
             );
@@ -58,16 +59,16 @@ public class ChangePasswordController {
 
     @PostMapping(value = "/submitChangingPassword", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
-        Optional<MessengerUser> foundedUser = userOperations.findByUsername(request.getUsername());
+        Optional<MessengerUser> foundedUser = userRepository.findByUsername(request.getUsername());
         Token token = tokenOperations.findByValue(request.getToken());
 
-        if (!userOperations.existByUsername(request.getUsername())) {
+        if (!userRepository.existsByUsername(request.getUsername())) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: this username doesn't exist!"));
         } else if (tokenOperations.findByValueAndUser(token.getValue(), foundedUser.get()).isPresent()) {
             foundedUser.get().setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
-            userOperations.update(foundedUser.get());
+            userRepository.save(foundedUser.get());
             tokenOperations.deleteById(tokenOperations.findByValueAndUser(token.getValue(), foundedUser.get()).get().getId());
         }
         return ResponseEntity.ok("Password changed successful");

@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface TokenRepository extends JpaRepository<Token, Long> {
     Token findByValue(String value);
-    Optional<Token> findByValueAndUser(String token, MessengerUser messengerUser);
+    Optional<Token> findByValueAndMessengerUser(String token, MessengerUser user);
 
 }

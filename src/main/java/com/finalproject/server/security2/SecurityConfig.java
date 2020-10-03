@@ -5,6 +5,7 @@ import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.security2.filters.JWTAuthenticationFilter;
 import com.finalproject.server.security2.filters.JWTAuthorizationFilter;
 import com.finalproject.server.security2.properties.SecurityProperties;
+import com.finalproject.server.service.impl.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)
+@EnableGlobalMethodSecurity(prePostEnabled=true,proxyTargetClass=true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
@@ -53,21 +56,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.objectMapper = objectMapper;
     }
 
-    @PostConstruct
-    public void init() {
-        setupDefaultAdmins();
-    }
-
-    private void setupDefaultAdmins() {
-        List<SignupRequest> requests = securityProperties.getAdmins().entrySet().stream()
-                .map(entry -> new SignupRequest(
-                        entry.getValue().getEmail(),
-                        entry.getValue().getPassword(),
-                        entry.getKey()))
-                .peek(admin -> log.info("Default admin found: {} <{}>", admin.getUsername(), admin.getEmail()))
-                .collect(Collectors.toList());
-        userService.mergeAdmins(requests);
-    }
+//    @PostConstruct
+//    public void init() {
+//        setupDefaultAdmins();
+//    }
+//
+//    private void setupDefaultAdmins() {
+//        List<SignupRequest> requests = securityProperties.getAdmins().entrySet().stream()
+//                .map(entry -> new SignupRequest(
+//                        entry.getValue().getEmail(),
+//                        entry.getValue().getPassword(),
+//                        entry.getKey()))
+//                .peek(admin -> log.info("Default admin found: {} <{}>", admin.getUsername(), admin.getEmail()))
+//                .collect(Collectors.toList());
+//        userService.mergeAdmins(requests);
+//    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -79,10 +82,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 // open static resources
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                // open swagger-ui
-                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // allow user registration
                 .antMatchers(HttpMethod.POST, "/users").permitAll()
+                .antMatchers(HttpMethod.GET, "/users/login").permitAll()
                 // admin can register new admins
                 .antMatchers(HttpMethod.POST, "/users/admins").hasRole("ADMIN")
                 // regular users can view basic user info for other users

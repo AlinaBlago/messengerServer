@@ -50,7 +50,7 @@ public class TokenService implements TokenOperations {
 
     @Override
     public Optional<Token> findByValueAndUser(String token, MessengerUser messengerUser) {
-        return tokenRepository.findByValueAndUser(token, messengerUser);
+        return tokenRepository.findByValueAndMessengerUser(token, messengerUser);
     }
 
 

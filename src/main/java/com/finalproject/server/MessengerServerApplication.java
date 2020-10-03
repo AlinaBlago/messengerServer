@@ -14,12 +14,12 @@ public class MessengerServerApplication {
       //userService.init();
       //messageService.init();// // // }
 }
-    @PreDestroy
-    public void onExit() throws IOException {
-
-    //  userService.save();
-    //  messageService.save();
-    }
+//    @PreDestroy
+//    public void onExit() throws IOException {
+//
+//    //  userService.save();
+//    //  messageService.save();
+//    }
 
 }
 

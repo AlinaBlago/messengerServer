@@ -4,7 +4,9 @@ import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Entity
@@ -37,7 +39,7 @@ public class MessengerUser {
             joinColumns = @JoinColumn(name = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_role")
     )
-    private Set<Role> roles = new HashSet<>();
+    private Map<ERole, Role> roles = new EnumMap<>(ERole.class);
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
@@ -96,11 +98,11 @@ public class MessengerUser {
         this.enabled = enabled;
     }
 
-    public Set<Role> getRoles() {
+    public Map<ERole, Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Map<ERole, Role> roles) {
         this.roles = roles;
     }
 
