@@ -13,9 +13,8 @@ public interface MessageOperations {
     Optional<Message> findMessageById(Long id);
     void deleteMessageById(Long id);
     Message add(Message message);
-    Set<MessengerUser> getUserChats(String login);
-    List<Message> getNewMessages(Long receiverId);
-    List<Message> getChat(Long receiverId, Long senderId);
+//    List<Message> getNewMessages(Long receiverId);
+//    List<Message> getChat(Long receiverId, Long senderId);
     Long save(Message message);
     void updateAll(Iterable<Message> messages);
 }

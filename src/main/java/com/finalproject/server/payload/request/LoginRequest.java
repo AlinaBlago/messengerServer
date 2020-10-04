@@ -1,9 +1,12 @@
 package com.finalproject.server.payload.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 import javax.validation.constraints.NotBlank;
 
 public class LoginRequest {
     @NotBlank
+    @JsonAlias({"username", "email"})
     private String username;
 
     @NotBlank

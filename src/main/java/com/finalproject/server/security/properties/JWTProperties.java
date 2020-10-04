@@ -1,4 +1,4 @@
-package com.finalproject.server.security2.properties;
+package com.finalproject.server.security.properties;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

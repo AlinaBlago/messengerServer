@@ -35,11 +35,6 @@ public class ImageService implements ImageOperations {
     }
 
     @Override
-    public Image add(Image image) {
-        return imageRepository.save(image);
-    }
-
-    @Override
     public Long save(Image image) {
         return imageRepository.save(image).getId();
     }

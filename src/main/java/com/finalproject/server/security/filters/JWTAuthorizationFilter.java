@@ -1,12 +1,12 @@
-package com.finalproject.server.security2.filters;
+package com.finalproject.server.security.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.finalproject.server.entity.ERole;
-import com.finalproject.server.security2.SecurityConstants;
-import com.finalproject.server.security2.properties.JWTProperties;
+import com.finalproject.server.security.SecurityConstants;
+import com.finalproject.server.security.properties.JWTProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +34,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                                   JWTProperties jwtProperties) {
         super(authenticationManager);
         this.jwtProperties = jwtProperties;
+//        this.jwtProperties = new JWTProperties();
+//        this.jwtProperties.setSecret("bezKoderSecretKey");
+//        this.jwtProperties.setExpireIn(180000);
     }
 
     @Override

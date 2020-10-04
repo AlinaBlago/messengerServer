@@ -9,7 +9,6 @@ import com.finalproject.server.payload.response.MessageResponse;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.security.token.CustomToken;
 import com.finalproject.server.service.TokenOperations;
-import com.finalproject.server.service.UserOperations;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

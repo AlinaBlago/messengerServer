@@ -1,4 +1,4 @@
-package com.finalproject.server.security2;
+package com.finalproject.server.security;
 
 public final class SecurityConstants {
 

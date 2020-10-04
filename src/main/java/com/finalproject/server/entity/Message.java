@@ -19,10 +19,6 @@ public class Message {
     @JoinColumn(name = "id_sender", nullable = false)
     MessengerUser sender;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_receiver", nullable = false)
-    MessengerUser receiver;
-
     @Column(name = "date", nullable = false)
     Date date;
 
@@ -33,15 +29,19 @@ public class Message {
     @Column(name = "is_read", nullable = false)
     boolean isRead;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_chat", nullable = false)
+    Chat chat;
+
     public Message() {
     }
 
-    public Message(String body, MessengerUser sender, MessengerUser receiver, Date date, boolean isRead){
+    public Message(String body, MessengerUser sender, Date date, boolean isRead, Chat id_chat){
         this.body = body;
         this.sender = sender;
-        this.receiver = receiver;
         this.date = date;
         this.isRead = isRead;
+        this.chat = id_chat;
     }
 
     public Long getId() {
@@ -68,14 +68,6 @@ public class Message {
         this.sender = id_sender;
     }
 
-    public MessengerUser getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(MessengerUser id_receiver) {
-        this.receiver = id_receiver;
-    }
-
     public Date getDate() {
         return date;
     }
@@ -100,13 +92,21 @@ public class Message {
         isRead = read;
     }
 
+    public Chat getChat() {
+        return chat;
+    }
+
+    public void setChat(Chat chat) {
+        this.chat = chat;
+    }
+
     @Override
     public String toString() {
         return "Message{" +
                 "body='" + body + '\'' +
                 ", id_sender=" + sender +
-                ", id_receiver=" + receiver +
                 ", date=" + date +
+                ", chat=" + chat +
                 ", id_image=" + idImage +
                 '}';
     }

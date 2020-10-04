@@ -1,34 +1,23 @@
 package com.finalproject.server.controller;
 
 import com.finalproject.server.exception.MessengerExceptions;
-import com.finalproject.server.payload.request.LoginRequest;
 import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.payload.request.UpdateUserRequest;
 import com.finalproject.server.payload.response.UserResponse;
 
-import com.finalproject.server.security2.properties.JWTProperties;
-import com.finalproject.server.security2.properties.SecurityProperties;
+import com.finalproject.server.security.properties.SecurityProperties;
 import com.finalproject.server.service.UserOperations;
-import com.finalproject.server.service.impl.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 public class AuthorizationController {
 
     private final UserOperations userOperations;
-    public AuthenticationManager authenticationManager;
     private final SecurityProperties securityProperties;
 
 
@@ -116,23 +105,6 @@ public class AuthorizationController {
 //        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 //    }
 
-    //TODO
-    @GetMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        JWTProperties jwt = securityProperties.getJwt();
-//
-//        UserService userDetails = (UserDetailsImpl) authentication.getPrincipal();
-//        List<String> roles = userDetails.getAuthorities().stream()
-//                .map(item -> item.getAuthority())
-//                .collect(Collectors.toList());
-
-      //  return ResponseEntity.ok(new JwtResponse(jwt, roles));
-        return ResponseEntity.ok(jwt);
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

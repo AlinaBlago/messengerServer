@@ -1,4 +1,4 @@
-package com.finalproject.server.security2.properties;
+package com.finalproject.server.security.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.Map;
 
 @Validated
-@ConfigurationProperties(prefix = "bezkoder")
+@ConfigurationProperties(prefix = "security")
 public class SecurityProperties {
 
     @Valid

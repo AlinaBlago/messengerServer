@@ -44,37 +44,16 @@ public class MessageService implements MessageOperations {
         return messageRepository.save(message);
     }
 
-    @Override
-    public Set<MessengerUser> getUserChats(String login) {
-        Set<MessengerUser> usersToReturn = new HashSet<>();
+//    @Override
+//    public List<Message> getNewMessages(Long receiverId) {
+//        List<Message> receiverMessages = messageRepository.getMessagesByReceiver_Id(receiverId);
+//        return receiverMessages.stream().filter(message -> message.isRead() == false).collect(Collectors.toList());
+//    }
 
-        for(Message msg1 : messages){
-            if(msg1.getSender().getUsername().equals(login) || msg1.getReceiver().getUsername().equals(login)){
-                usersToReturn.add(msg1.getReceiver());
-                usersToReturn.add(msg1.getSender());
-            }
-        }
-
-        for(Message msg : unreadMessages){
-            if(msg.getSender().getUsername().equals(login) || msg.getReceiver().getUsername().equals(login)){
-                usersToReturn.add(msg.getReceiver());
-                usersToReturn.add(msg.getSender());
-            }
-        }
-
-        return usersToReturn;
-    }
-
-    @Override
-    public List<Message> getNewMessages(Long receiverId) {
-        List<Message> receiverMessages = messageRepository.getMessagesByReceiver_Id(receiverId);
-        return receiverMessages.stream().filter(message -> message.isRead() == false).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Message> getChat(Long receiverId, Long senderId) {
-        return messageRepository.getMessagesByReceiver_IdAndSender_Id(receiverId, senderId);
-    }
+//    @Override
+//    public List<Message> getChat(Long receiverId, Long senderId) {
+//        return messageRepository.getMessagesByReceiver_IdAndSender_Id(receiverId, senderId);
+//    }
 
     @Override
     public Long save(Message message) {

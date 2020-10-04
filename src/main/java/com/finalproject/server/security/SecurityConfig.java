@@ -1,10 +1,10 @@
-package com.finalproject.server.security2;
+package com.finalproject.server.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.finalproject.server.payload.request.SignupRequest;
-import com.finalproject.server.security2.filters.JWTAuthenticationFilter;
-import com.finalproject.server.security2.filters.JWTAuthorizationFilter;
-import com.finalproject.server.security2.properties.SecurityProperties;
+import com.finalproject.server.security.filters.JWTAuthenticationFilter;
+import com.finalproject.server.security.filters.JWTAuthorizationFilter;
+import com.finalproject.server.security.properties.JWTProperties;
+import com.finalproject.server.security.properties.SecurityProperties;
 import com.finalproject.server.service.impl.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +26,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 @EnableConfigurationProperties(SecurityProperties.class)
@@ -56,21 +54,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.objectMapper = objectMapper;
     }
 
-//    @PostConstruct
-//    public void init() {
-//        setupDefaultAdmins();
-//    }
-//
-//    private void setupDefaultAdmins() {
-//        List<SignupRequest> requests = securityProperties.getAdmins().entrySet().stream()
-//                .map(entry -> new SignupRequest(
-//                        entry.getValue().getEmail(),
-//                        entry.getValue().getPassword(),
-//                        entry.getKey()))
-//                .peek(admin -> log.info("Default admin found: {} <{}>", admin.getUsername(), admin.getEmail()))
-//                .collect(Collectors.toList());
-//        userService.mergeAdmins(requests);
-//    }
+    @PostConstruct
+    public void init(){
+        JWTProperties props = new JWTProperties();
+        props.setSecret("bezKoderSecretKey");
+        props.setExpireIn(1800000000);
+        this.securityProperties.setJwt(props);
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -84,7 +74,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 // allow user registration
                 .antMatchers(HttpMethod.POST, "/users").permitAll()
-                .antMatchers(HttpMethod.GET, "/users/login").permitAll()
                 // admin can register new admins
                 .antMatchers(HttpMethod.POST, "/users/admins").hasRole("ADMIN")
                 // regular users can view basic user info for other users

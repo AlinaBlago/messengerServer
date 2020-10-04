@@ -1,11 +1,11 @@
-package com.finalproject.server.security2.filters;
+package com.finalproject.server.security.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.server.payload.request.LoginRequest;
-import com.finalproject.server.security2.SecurityConstants;
-import com.finalproject.server.security2.properties.JWTProperties;
+import com.finalproject.server.security.SecurityConstants;
+import com.finalproject.server.security.properties.JWTProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,21 +29,17 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final ObjectMapper objectMapper;
 
-    public JWTAuthenticationFilter(
-            AuthenticationManager authenticationManager,
-            JWTProperties jwtProperties,
-            ObjectMapper objectMapper
-    ) {
+    public JWTAuthenticationFilter( AuthenticationManager authenticationManager, JWTProperties jwtProperties, ObjectMapper objectMapper)
+    {
         setAuthenticationManager(authenticationManager);
         setUsernameParameter("login");
+
         this.jwtProperties = jwtProperties;
         this.objectMapper = objectMapper;
     }
 
-
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest req,
-                                                HttpServletResponse res) throws AuthenticationException {
+    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
         LoginRequest credentials;
         try {
             credentials = objectMapper.readValue(req.getInputStream(), LoginRequest.class);
@@ -58,11 +54,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest req,
-                                            HttpServletResponse res,
-                                            FilterChain chain,
-                                            Authentication auth) {
-
+    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth)
+    {
         long now = System.currentTimeMillis();
         var principal = (UserDetails) auth.getPrincipal();
         String token = JWT.create()

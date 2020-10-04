@@ -1,4 +1,4 @@
-package com.finalproject.server.security2;
+package com.finalproject.server.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -39,6 +39,8 @@ public class MessengerUser {
             joinColumns = @JoinColumn(name = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_role")
     )
+    @MapKeyEnumerated(EnumType.STRING)
+    @MapKey(name = "name")
     private Map<ERole, Role> roles = new EnumMap<>(ERole.class);
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -53,7 +55,7 @@ public class MessengerUser {
     }
 
     public MessengerUser(String email, String username, String password){
-        this.email = email;
+      //  this.email = email;
         this.username = username;
         this.password = password;
     }
@@ -118,7 +120,7 @@ public class MessengerUser {
     @Override
     public String toString() {
         return "User{" +
-                "email='" + email + '\'' +
+               // "email='" + email + '\'' +
                 ", login='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", isAdmin=" + enabled +

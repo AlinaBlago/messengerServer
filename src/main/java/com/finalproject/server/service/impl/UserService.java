@@ -251,12 +251,12 @@ public class UserService implements UserOperations, UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        MessengerUser user = userRepository.findByEmail(username)
+        MessengerUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
 
         Set<ERole> roles = EnumSet.copyOf(user.getRoles().keySet());
 
-        return new User(user.getEmail(), user.getPassword(), roles);
+        return new User(user.getUsername(), user.getPassword(), roles);
     }
 
 
