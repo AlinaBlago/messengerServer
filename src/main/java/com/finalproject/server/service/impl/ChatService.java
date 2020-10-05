@@ -2,7 +2,10 @@ package com.finalproject.server.service.impl;
 
 import com.finalproject.server.entity.Chat;
 import com.finalproject.server.entity.MessengerUser;
+import com.finalproject.server.payload.request.AddChatRequest;
+import com.finalproject.server.payload.response.ChatResponse;
 import com.finalproject.server.repository.ChatRepository;
+import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.ChatOperations;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +20,11 @@ import java.util.stream.Stream;
 @Transactional
 public class ChatService implements ChatOperations {
     private final ChatRepository chatRepository;
+    private final UserRepository userRepository;
 
-    public ChatService(ChatRepository chatRepository) {
+    public ChatService(ChatRepository chatRepository, UserRepository userRepository) {
         this.chatRepository = chatRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -40,6 +45,31 @@ public class ChatService implements ChatOperations {
     @Override
     public Chat save(Chat chat) {
         return chatRepository.save(chat);
+    }
+
+    @Override
+    public ChatResponse addChat(Optional<MessengerUser> user, AddChatRequest request) {
+        MessengerUser msgUser = user.get();
+        Optional<MessengerUser> secondUser = userRepository.findByUsername(request.getUsername());
+
+        if (secondUser.isPresent()) {
+            var leftList = chatRepository.findChatsByFirstUser(msgUser);
+            leftList.retainAll(chatRepository.findChatsBySecondUser(secondUser.get()));
+
+            var swapLeftList = chatRepository.findChatsByFirstUser(secondUser.get());
+            swapLeftList.retainAll(chatRepository.findChatsBySecondUser(msgUser));
+
+            if (leftList.size() == 0 && swapLeftList.size() == 0)
+            {
+                Chat chat = new Chat();
+                chat.setFirstUser(msgUser);
+                chat.setSecondUser(secondUser.get());
+                chatRepository.save(chat);
+                ChatResponse resp = new ChatResponse(chat.getId(), chat.getFirstUser().getUsername(), chat.getSecondUser().getUsername());
+                return resp;
+            }
+        }
+        return null;
     }
 
     @Override

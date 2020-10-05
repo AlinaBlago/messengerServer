@@ -30,24 +30,6 @@ public class AuthorizationController {
 //    @ResponseStatus(HttpStatus.CREATED)
 //    @PostMapping(value = "/signUp", produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity<?> signUp(@Valid @RequestBody SignupRequest request) {
-//        if (userOperations.existByUsername(request.getUsername())) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error: Username is already taken!"));
-//        }
-//
-//        if (userOperations.existsByEmail(request.getEmail())) {
-//            return ResponseEntity
-//                    .badRequest()
-//                    .body(new MessageResponse("Error: Email is already in use!"));
-//        }
-//
-//        MessengerUser messengerUser = new MessengerUser(
-//                request.getEmail(),
-//                request.getUsername(),
-//                bCryptPasswordEncoder.encode(request.getPassword())
-//                );
-//
 //        Set<String> strStates = request.getState();
 //        Set<State> states = new HashSet<>();
 //        if (strStates == null) {
@@ -74,37 +56,7 @@ public class AuthorizationController {
 //                }
 //            });
 //        }
-//
-//        Set<String> strRoles = request.getRole();
-//        Set<Role> roles = new HashSet<>();
-//
-//        if (strRoles == null) {
-//            Role userRole = roleOperations.findByName(ERole.ROLE_USER)
-//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//            roles.add(userRole);
-//        } else {
-//            strRoles.forEach(role -> {
-//                switch (role) {
-//                    case "admin":
-//                        Role adminRole = roleOperations.findByName(ERole.ROLE_ADMIN)
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(adminRole);
-//                        break;
-//                    default:
-//                        Role userRole = roleOperations.findByName(ERole.ROLE_USER)
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(userRole);
-//                }
-//            });
-//        }
-//
-//        messengerUser.setRoles(roles);
-//        messengerUser.setStates(states);
-//        userOperations.save(messengerUser);
-//
-//        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 //    }
-
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

@@ -4,24 +4,24 @@ import javax.validation.constraints.NotBlank;
 
 public class SendMessageRequest {
     @NotBlank
-    private Long chatId;
+    private String receiver;
     @NotBlank
     private String message;
 
     public SendMessageRequest() {
     }
 
-    public SendMessageRequest(@NotBlank Long chatId, @NotBlank String message) {
-        this.chatId = chatId;
+    public SendMessageRequest(@NotBlank String receiver, @NotBlank String message) {
+        this.receiver = receiver;
         this.message = message;
     }
 
-    public Long getChatId() {
-        return chatId;
+    public String getReceiver() {
+        return receiver;
     }
 
-    public void setChatId(Long chatId) {
-        this.chatId = chatId;
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
     }
 
     public String getMessage() {
@@ -35,7 +35,7 @@ public class SendMessageRequest {
     @Override
     public String toString() {
         return "SendMessageRequest{" +
-                "chatId=" + chatId +
+                "receiver=" + receiver +
                 ", message='" + message + '\'' +
                 '}';
     }

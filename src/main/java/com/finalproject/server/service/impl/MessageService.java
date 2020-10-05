@@ -1,15 +1,20 @@
 package com.finalproject.server.service.impl;
 
 
+import com.finalproject.server.entity.Chat;
 import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.MessengerUser;
+import com.finalproject.server.payload.request.GetChatRequest;
+import com.finalproject.server.payload.request.SendMessageRequest;
+import com.finalproject.server.repository.ChatRepository;
 import com.finalproject.server.repository.MessageRepository;
+import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.MessageOperations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -19,9 +24,13 @@ public class MessageService implements MessageOperations {
     List<Message> unreadMessages = new ArrayList<>();
 
     private final MessageRepository messageRepository;
+    private final UserRepository userRepository;
+    private final ChatRepository chatRepository;
 
-    public MessageService(MessageRepository messageRepository) {
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository, ChatRepository chatRepository) {
         this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
+        this.chatRepository = chatRepository;
     }
 
     @Override
@@ -40,9 +49,35 @@ public class MessageService implements MessageOperations {
     }
 
     @Override
-    public Message add(Message message) {
-        return messageRepository.save(message);
+    public Message add(Optional<MessengerUser> sender, SendMessageRequest request) {
+        Optional<MessengerUser> receiver = userRepository.findByUsername(request.getReceiver());
+        Chat chat = chatRepository.findChatByFirstUserAndSecondUser(sender.get(), receiver.get());
+        Message message = new Message();
+
+        if(receiver.isPresent()) {
+            message.setBody(request.getMessage());
+            message.setSender(sender.get());
+            message.setDate(new Date(System.currentTimeMillis()));
+            message.setChat(chat);
+            message.setRead(false);
+            messageRepository.save(message);
+            return message;
+
+        } else {
+            return null;
+        }
     }
+
+    @Override
+    public List<Message> findByChat(Optional<MessengerUser> user, GetChatRequest request) {
+        Optional<MessengerUser> companion = userRepository.findByUsername(request.getUser());
+
+        Chat chat = chatRepository.findChatByFirstUserAndSecondUser(user.get(), companion.get());
+        List<Message> messages = messageRepository.findAllByChat(chat);
+
+        return messages;
+    }
+
 
 //    @Override
 //    public List<Message> getNewMessages(Long receiverId) {
@@ -54,11 +89,6 @@ public class MessageService implements MessageOperations {
 //    public List<Message> getChat(Long receiverId, Long senderId) {
 //        return messageRepository.getMessagesByReceiver_IdAndSender_Id(receiverId, senderId);
 //    }
-
-    @Override
-    public Long save(Message message) {
-        return messageRepository.save(message).getId();
-    }
 
     @Override
     public void updateAll(Iterable<Message> messages) {

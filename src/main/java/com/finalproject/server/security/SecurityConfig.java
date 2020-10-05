@@ -73,7 +73,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // open static resources
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 // allow user registration
-                .antMatchers(HttpMethod.POST, "/users").permitAll()
+                .antMatchers(HttpMethod.POST, "/users", "/password/**").permitAll()
                 // admin can register new admins
                 .antMatchers(HttpMethod.POST, "/users/admins").hasRole("ADMIN")
                 // regular users can view basic user info for other users

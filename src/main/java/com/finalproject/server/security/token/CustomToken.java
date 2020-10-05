@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class CustomToken {
     private static final Random random = new Random();
-    private static final String CHARS = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890!@#$";
+    private static final String CHARS = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ234567890";
 
     public static String getToken() {
         StringBuilder token = new StringBuilder(8);

@@ -1,70 +1,52 @@
 package com.finalproject.server.controller;
 
 import com.finalproject.server.entity.Chat;
+import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.payload.request.AddChatRequest;
+import com.finalproject.server.payload.request.GetChatRequest;
 import com.finalproject.server.payload.request.SendMessageRequest;
 import com.finalproject.server.payload.response.ChatResponse;
 import com.finalproject.server.repository.ChatRepository;
+import com.finalproject.server.repository.MessageRepository;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.MessageOperations;
 import com.finalproject.server.service.UserOperations;
 import com.finalproject.server.service.impl.ChatService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
 public class MessageController {
-    private final UserOperations userOperations;
     private final UserRepository userRepository;
     private final MessageOperations messageOperations;
     private final ChatService chatService;
     private final ChatRepository chatRepository;
+    private final MessageRepository messageRepository;
 
-    public MessageController(UserOperations userOperations, UserRepository userRepository, MessageOperations messageOperations, ChatService chatService, ChatRepository chatRepository) {
-        this.userOperations = userOperations;
+    public MessageController(UserRepository userRepository, MessageOperations messageOperations, ChatService chatService, ChatRepository chatRepository, MessageRepository messageRepository) {
         this.userRepository = userRepository;
         this.messageOperations = messageOperations;
         this.chatService = chatService;
         this.chatRepository = chatRepository;
-    }
-
-    @PostMapping(value = "/me")
-    public void sendMessage(@AuthenticationPrincipal String email, SendMessageRequest request){
-
+        this.messageRepository = messageRepository;
     }
 
     @PostMapping(value = "/me/chats")
     public ResponseEntity<ChatResponse> addChat(@AuthenticationPrincipal String email, @RequestBody AddChatRequest request) {
-        Optional<MessengerUser> user = userRepository.findByUsername(email);
-        MessengerUser msgUser = user.get();
-        Optional<MessengerUser> secondUser = userRepository.findByUsername(request.getUsername());
-
-        if (secondUser.isPresent()) {
-            var leftList = chatRepository.findChatsByFirstUser(msgUser);
-            leftList.retainAll(chatRepository.findChatsBySecondUser(secondUser.get()));
-
-            var swapLeftList = chatRepository.findChatsByFirstUser(secondUser.get());
-            swapLeftList.retainAll(chatRepository.findChatsBySecondUser(msgUser));
-
-            if (leftList.size() == 0 && swapLeftList.size() == 0)
-            {
-                Chat chat = new Chat();
-                chat.setFirstUser(msgUser);
-                chat.setSecondUser(secondUser.get());
-                chatRepository.save(chat);
-                ChatResponse resp = new ChatResponse(chat.getId(), chat.getFirstUser().getUsername(), chat.getSecondUser().getUsername());
-                return ResponseEntity.ok(resp);
-            }
+        ChatResponse response =  chatService.addChat(userRepository.findByUsername(email), request);
+        if (response != null){
+            return ResponseEntity.ok(response);
+            } else {
+            return ResponseEntity.badRequest().body(null);
         }
-        return ResponseEntity.badRequest().body(null);
     }
 
     @GetMapping(value = "/me/chats")
@@ -79,7 +61,29 @@ public class MessageController {
 
         return response;
     }
-//
+
+    @PostMapping(value = "/me/messages")
+    public ResponseEntity sendMessage(@AuthenticationPrincipal String email, @RequestBody SendMessageRequest request) {
+        Message message = messageOperations.add(userRepository.findByUsername(email), request);
+
+        if (message == null) {
+            return ResponseEntity.badRequest().body(null);
+        } else {
+            return ResponseEntity.ok("Ok");
+        }
+    }
+
+    @PostMapping(value = "/me/chat")
+    public ResponseEntity<List<Message>> getChat(@AuthenticationPrincipal String email, @RequestBody GetChatRequest request){
+        List<Message> messages = messageOperations.findByChat(userRepository.findByUsername(email), request);
+
+        if (messages != null){
+            return ResponseEntity.ok(messages);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 //    @RequestMapping(value = "/isUserExists" , method = RequestMethod.GET,
 //            produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity isUserExists(String senderLogin, String userLogin){
@@ -92,25 +96,7 @@ public class MessageController {
 //
 //        return new  ResponseEntity(HttpStatus.CONFLICT);
 //    }
-////
-//    @RequestMapping(value = "/sendMessage" , method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity sendMessage(Long senderId, String login, Long receiverId, String message){
-//
-//        Optional<MessengerUser> sender = userOperations.findById(senderId);
-//        Optional<MessengerUser> receiver = userOperations.findById(receiverId);
-//
-//        if(userOperations.findByUsername(login).isPresent())
-//            if (!sender.isEmpty() && !receiver.isEmpty()) {
-//            Message message1 = new Message(message, sender.get(), receiver.get(), new Date(System.currentTimeMillis()), false);
-//            messageOperations.add(message1);
-//
-//            return new  ResponseEntity(HttpStatus.OK);
-//        }
-//
-//        return new  ResponseEntity(HttpStatus.CONFLICT);
-//    }
-//
+
 //    @RequestMapping(value = "/haveNewMessages" , method = RequestMethod.GET,
 //            produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity haveNewMessages(Long senderId, String login){
@@ -123,19 +109,6 @@ public class MessageController {
 //
 //        return new  ResponseEntity(HttpStatus.CONFLICT);
 //    }
-////
-//    @RequestMapping(value = "/getChat" , method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity haveNewMessages(Long idSender, String senderLogin, Long idReceiver){
-//
-//        if(userOperations.findByUsername(senderLogin).isPresent()){
-//
-//            List<Message> messages = messageOperations.getChat(idSender, idReceiver);
-//
-//            return new  ResponseEntity(HttpStatus.OK);
-//        }
-//
-//        return new  ResponseEntity(HttpStatus.CONFLICT);
-//    }
+
 
 }

@@ -3,18 +3,20 @@ package com.finalproject.server.service.impl;
 import com.finalproject.server.entity.ERole;
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.entity.Role;
+import com.finalproject.server.entity.Token;
 import com.finalproject.server.exception.MessengerExceptions;
+import com.finalproject.server.payload.request.ChangePasswordRequest;
 import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.payload.request.UpdateUserRequest;
 import com.finalproject.server.payload.response.UserResponse;
 import com.finalproject.server.repository.RoleRepository;
 import com.finalproject.server.repository.UserRepository;
+import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +32,13 @@ public class UserService implements UserOperations, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final TokenOperations tokenOperations;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, TokenOperations tokenOperations) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
+        this.tokenOperations = tokenOperations;
     }
 
 //    @Override
@@ -207,6 +211,20 @@ public class UserService implements UserOperations, UserDetailsService {
             user.setPassword(passwordEncoder.encode(password));
         }
         return userRepository.save(user);
+    }
+
+    public void update(ChangePasswordRequest request) {
+        Optional<MessengerUser> user = userRepository.findByUsername(request.getUsername());
+        Token token = tokenOperations.findByValue(request.getToken());
+
+        if (tokenOperations.findByValueAndUser(token.getValue(), user.get()).isPresent()) {
+                String password = request.getPassword();
+                if (password != null) {
+                    user.get().setPassword(passwordEncoder.encode(password));
+                    tokenOperations.deleteById(tokenOperations.findByValueAndUser(token.getValue(), user.get()).get().getId());
+                    userRepository.save(user.get());
+                }
+        }
     }
 
     private MessengerUser save(SignupRequest request, Map<ERole, Role> authorities) {
