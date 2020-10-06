@@ -12,6 +12,6 @@ public interface UserRepository extends JpaRepository<MessengerUser, Long> {
     MessengerUser findByUsernameAndPassword(String username, String password);
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
-    void deleteByEmail(String email);
+    void deleteMessengerUserByUsername(String username);
 
 }

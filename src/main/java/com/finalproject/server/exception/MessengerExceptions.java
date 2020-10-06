@@ -13,6 +13,10 @@ public class MessengerExceptions {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, "User authority " + value + " not defined");
     }
 
+    public static ResponseStatusException stateNotFound(String value) {
+        return new ResponseStatusException(HttpStatus.NOT_FOUND, "User state " + value + " not defined");
+    }
+
     public static ResponseStatusException userNotFound(String email) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, "User with email " + email + " not found");
     }

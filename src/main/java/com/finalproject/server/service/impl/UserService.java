@@ -1,9 +1,6 @@
 package com.finalproject.server.service.impl;
 
-import com.finalproject.server.entity.ERole;
-import com.finalproject.server.entity.MessengerUser;
-import com.finalproject.server.entity.Role;
-import com.finalproject.server.entity.Token;
+import com.finalproject.server.entity.*;
 import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.ChangeEmailRequest;
 import com.finalproject.server.payload.request.ChangePasswordRequest;
@@ -11,6 +8,7 @@ import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.payload.request.UpdateUserRequest;
 import com.finalproject.server.payload.response.UserResponse;
 import com.finalproject.server.repository.RoleRepository;
+import com.finalproject.server.repository.StateRepository;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
@@ -35,12 +33,14 @@ public class UserService implements UserOperations, UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final TokenOperations tokenOperations;
+    private final StateRepository stateRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, TokenOperations tokenOperations) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, TokenOperations tokenOperations, StateRepository stateRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.tokenOperations = tokenOperations;
+        this.stateRepository = stateRepository;
     }
 
     @Override
@@ -72,14 +72,14 @@ public class UserService implements UserOperations, UserDetailsService {
     @Override
     public UserResponse create(SignupRequest request) {
         validateUniqueFields(request);
-        return UserResponse.fromUser(save(request, getRegularUserAuthorities()));
+        return UserResponse.fromUser(save(request, getRegularUserAuthorities(), getUnactiveUserStates()));
 
     }
 
     @Override
     public UserResponse createAdmin(SignupRequest request) {
         validateUniqueFields(request);
-        return UserResponse.fromUser(save(request, getAdminAuthorities()));
+        return UserResponse.fromUser(save(request, getAdminAuthorities(), getRegularUserStates()));
 
     }
 
@@ -89,8 +89,9 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public void deleteByEmail(String email) {
-        userRepository.deleteByEmail(email);
+    public void deleteByUsername(String username) {
+        MessengerUser user = userRepository.findByUsername(username).get();
+        user.setStates(getDeletedUserStates());
     }
 
     public void mergeAdmins(List<SignupRequest> requests) {
@@ -172,9 +173,10 @@ public class UserService implements UserOperations, UserDetailsService {
         }
     }
 
-    private MessengerUser save(SignupRequest request, Map<ERole, Role> authorities) {
+    private MessengerUser save(SignupRequest request, Map<ERole, Role> authorities, Map<EState, State> states) {
         var user = new MessengerUser();
         user.getRoles().putAll(authorities);
+        user.setStates(states);
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -201,6 +203,42 @@ public class UserService implements UserOperations, UserDetailsService {
         return authorities;
     }
 
+    private Map<EState, State> getDeletedUserStates() {
+        State state = stateRepository
+                .findByName(EState.DELETED)
+                .orElseThrow(() -> MessengerExceptions.stateNotFound(EState.DELETED.name()));
+        Map<EState, State> states = new EnumMap<>(EState.class);
+        states.put(EState.DELETED, state);
+        return states;
+    }
+
+    private Map<EState, State> getUnactiveUserStates() {
+        State state = stateRepository
+                .findByName(EState.UNACTIVE)
+                .orElseThrow(() -> MessengerExceptions.stateNotFound(EState.UNACTIVE.name()));
+        Map<EState, State> states = new EnumMap<>(EState.class);
+        states.put(EState.UNACTIVE, state);
+        return states;
+    }
+
+    private Map<EState, State> getActiveUserStates() {
+        State state = stateRepository
+                .findByName(EState.ACTIVE)
+                .orElseThrow(() -> MessengerExceptions.stateNotFound(EState.ACTIVE.name()));
+        Map<EState, State> states = new EnumMap<>(EState.class);
+        states.put(EState.ACTIVE, state);
+        return states;
+    }
+
+    private Map<EState, State> getRegularUserStates() {
+        State state = stateRepository
+                .findByName(EState.ACTIVE)
+                .orElseThrow(() -> MessengerExceptions.stateNotFound(EState.ACTIVE.name()));
+        Map<EState, State> states = new EnumMap<>(EState.class);
+        states.put(EState.ACTIVE, state);
+        return states;
+    }
+
     private void validateUniqueFields(SignupRequest request) {
         String email = request.getEmail();
         if (userRepository.existsByEmail(email)) {
@@ -221,6 +259,5 @@ public class UserService implements UserOperations, UserDetailsService {
 
         return new User(user.getUsername(), user.getPassword(), roles);
     }
-
 
 }

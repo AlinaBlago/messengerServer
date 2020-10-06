@@ -6,7 +6,6 @@ import com.finalproject.server.payload.request.*;
 import com.finalproject.server.payload.response.UserResponse;
 
 import com.finalproject.server.repository.UserRepository;
-import com.finalproject.server.security.properties.SecurityProperties;
 import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
 import com.finalproject.server.service.impl.UserService;
@@ -34,51 +33,11 @@ public class UserController {
         this.userService = userService;
     }
 
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-//    @ResponseStatus(HttpStatus.CREATED)
-//    @PostMapping(value = "/signUp", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> signUp(@Valid @RequestBody SignupRequest request) {
-//        Set<String> strStates = request.getState();
-//        Set<State> states = new HashSet<>();
-//        if (strStates == null) {
-//            State userState = stateOperations.findByName(EState.ACTIVE)
-//                    .orElseThrow(() -> new RuntimeException("Error: State is not found."));
-//            states.add(userState);
-//        } else {
-//            strStates.forEach(state -> {
-//                switch (state) {
-//                    case "locked":
-//                        State lockedState = stateOperations.findByName(EState.LOCKED)
-//                                .orElseThrow(() -> new RuntimeException("Error: State is not found."));
-//                        states.add(lockedState);
-//                        break;
-//                    case "deleted":
-//                        State deletedState = stateOperations.findByName(EState.DELETED)
-//                                .orElseThrow(() -> new RuntimeException("Error: State is not found."));
-//                        states.add(deletedState);
-//                        break;
-//                    default:
-//                        State activeState = stateOperations.findByName(EState.ACTIVE)
-//                                .orElseThrow(() -> new RuntimeException("Error: State is not found."));
-//                        states.add(activeState);
-//                }
-//            });
-//        }
-//    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse register(@RequestBody @Valid SignupRequest request) {
         return userOperations.create(request);
     }
-
-
-    @PostMapping("/admins")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse registerAdmin(@RequestBody @Valid SignupRequest request) {
-        return userOperations.createAdmin(request);
-    }
-
 
     @GetMapping("/me")
     public UserResponse getCurrentUser(@AuthenticationPrincipal String email) {
@@ -92,16 +51,10 @@ public class UserController {
         return userOperations.updateByUsername(email, request);
     }
 
-    //TODO
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCurrentUser(@AuthenticationPrincipal String email) {
-        userOperations.deleteByEmail(email);
-    }
-
-    @GetMapping("/{id}")
-    public UserResponse getUserById(@PathVariable long id) {
-        return userOperations.findById(id).orElseThrow(() -> MessengerExceptions.userNotFound(id));
+        userOperations.deleteByUsername(email);
     }
 
     @PostMapping(value = "/me/email", produces = MediaType.APPLICATION_JSON_VALUE)

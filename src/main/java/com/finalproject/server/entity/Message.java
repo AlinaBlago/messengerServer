@@ -15,21 +15,21 @@ public class Message {
     @Column(name = "body", nullable = false)
     String body;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_sender", nullable = false)
     MessengerUser sender;
 
     @Column(name = "date", nullable = false)
     Date date;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_image", nullable = false)
     Image idImage;
 
     @Column(name = "is_read", nullable = false)
     boolean isRead;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_chat", nullable = false)
     Chat chat;
 

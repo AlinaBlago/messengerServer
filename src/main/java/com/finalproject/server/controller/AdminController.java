@@ -1,28 +1,48 @@
 package com.finalproject.server.controller;
 
-import com.finalproject.server.service.MessageOperations;
+import com.finalproject.server.exception.MessengerExceptions;
+import com.finalproject.server.payload.request.SignupRequest;
+import com.finalproject.server.payload.response.UserResponse;
 import com.finalproject.server.service.UserOperations;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Set;
+import javax.validation.Valid;
 
 @RestController
+@RequestMapping("/users")
 public class AdminController {
 
-//    private final MessageOperations messageOperations;
-//    private final UserOperations userOperations;
-//
-//    public AdminController(MessageOperations messageOperations, UserOperations userOperations) {
-//        this.messageOperations = messageOperations;
-//        this.userOperations = userOperations;
-//    }
-//
+    private final UserOperations userOperations;
+
+    public AdminController(UserOperations userOperations) {
+        this.userOperations = userOperations;
+    }
+
+    @PostMapping("/admins")
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse registerAdmin(@RequestBody @Valid SignupRequest request) {
+        return userOperations.createAdmin(request);
+    }
+
+    @GetMapping("/{id}")
+    public UserResponse getUserById(@PathVariable long id) {
+        return userOperations.findById(id).orElseThrow(() -> MessengerExceptions.userNotFound(id));
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void lockUser(@AuthenticationPrincipal String email) {
+        userOperations.deleteByUsername(email);
+    }
+
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void unLockCurrentUser(@AuthenticationPrincipal String email) {
+        userOperations.deleteByUsername(email);
+    }
+
 //    @RequestMapping(value = "/loadUsersForAdmin" , method = RequestMethod.GET,
 //            produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity<Set<String>> loadUsersForAdmin(String login){

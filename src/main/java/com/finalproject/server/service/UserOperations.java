@@ -40,6 +40,6 @@ public interface UserOperations {
 
     void deleteById(long id);
 
-    void deleteByEmail(String email);
+    void deleteByUsername(String email);
 
 }

@@ -34,9 +34,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                                   JWTProperties jwtProperties) {
         super(authenticationManager);
         this.jwtProperties = jwtProperties;
-//        this.jwtProperties = new JWTProperties();
-//        this.jwtProperties.setSecret("bezKoderSecretKey");
-//        this.jwtProperties.setExpireIn(180000);
     }
 
     @Override
@@ -63,7 +60,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         String encodedJwt = token.substring(SecurityConstants.AUTH_TOKEN_PREFIX.length());
 
-        // parse the token.
         DecodedJWT decodedJWT;
         try {
             decodedJWT = JWT.require(Algorithm.HMAC512(jwtProperties.getSecret().getBytes()))

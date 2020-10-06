@@ -2,6 +2,8 @@ package com.finalproject.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -31,7 +33,7 @@ public class MessengerUser {
     String username;
 
     @JsonIgnore
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", nullable = false)
     String password;
 
     @JsonIgnore
@@ -42,7 +44,7 @@ public class MessengerUser {
     private Instant createdAt;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "id_user"),
@@ -53,13 +55,15 @@ public class MessengerUser {
     private Map<ERole, Role> roles = new EnumMap<>(ERole.class);
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "users_states",
             joinColumns = @JoinColumn(name = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_state")
     )
-    private Set<State> states = new HashSet<>();
+    @MapKeyEnumerated(EnumType.STRING)
+    @MapKey(name = "name")
+    private Map<EState, State> states = new EnumMap<>(EState.class);
 
     public MessengerUser() {
     }
@@ -117,11 +121,11 @@ public class MessengerUser {
         this.roles = roles;
     }
 
-    public Set<State> getStates() {
+    public Map<EState, State> getStates() {
         return states;
     }
 
-    public void setStates(Set<State> states) {
+    public void setStates(Map<EState, State> states) {
         this.states = states;
     }
 
