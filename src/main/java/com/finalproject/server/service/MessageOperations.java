@@ -18,7 +18,7 @@ public interface MessageOperations {
     Optional<Message> findMessageById(Long id);
     void deleteMessageById(Long id);
     Message add(Optional<MessengerUser> sender, SendMessageRequest request);
-    List<Message> findByChat(Optional<MessengerUser> user, GetChatRequest request);
+    List<Message> loadChat(Optional<MessengerUser> user, GetChatRequest request);
 //  List<Message> getNewMessages(Long receiverId);
     void updateAll(Iterable<Message> messages);
 }

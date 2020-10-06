@@ -3,6 +3,7 @@ package com.finalproject.server.service.impl;
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.entity.Token;
 import com.finalproject.server.mail.MailService;
+import com.finalproject.server.payload.request.GetTokenForUpdateEmailRequest;
 import com.finalproject.server.payload.request.SendChangePasswordTokenRequest;
 import com.finalproject.server.payload.response.ChangePasswordResponse;
 import com.finalproject.server.payload.response.MessageResponse;
@@ -64,6 +65,24 @@ public class TokenService implements TokenOperations {
         return token;
 
         }
+
+    @Override
+    public String add(MessengerUser user, GetTokenForUpdateEmailRequest request) {
+        String token = CustomToken.getToken();
+
+        Token userToken = new Token();
+        userToken.setValue(token);
+        userToken.setMessengerUser(user);
+        tokenRepository.save(userToken);
+
+        mailService.sendSimpleMessage(
+                request.getEmail(),
+                "Your personal token for changing email",
+                token
+        );
+        return token;
+
+    }
 
     @Override
     public Token findByValue(String value) {

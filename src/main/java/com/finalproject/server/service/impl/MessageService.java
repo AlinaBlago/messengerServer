@@ -51,29 +51,44 @@ public class MessageService implements MessageOperations {
     @Override
     public Message add(Optional<MessengerUser> sender, SendMessageRequest request) {
         Optional<MessengerUser> receiver = userRepository.findByUsername(request.getReceiver());
-        Chat chat = chatRepository.findChatByFirstUserAndSecondUser(sender.get(), receiver.get());
         Message message = new Message();
 
         if(receiver.isPresent()) {
-            message.setBody(request.getMessage());
-            message.setSender(sender.get());
-            message.setDate(new Date(System.currentTimeMillis()));
-            message.setChat(chat);
-            message.setRead(false);
-            messageRepository.save(message);
-            return message;
+            Chat chat = chatRepository.findChatByFirstUserAndSecondUser(sender.get(), receiver.get());
 
-        } else {
-            return null;
+            if(chat != null){
+                message.setBody(request.getMessage());
+                message.setSender(sender.get());
+                message.setDate(new Date(System.currentTimeMillis()));
+                message.setChat(chat);
+                message.setRead(false);
+
+                messageRepository.save(message);
+            }
         }
+
+        return message;
     }
 
     @Override
-    public List<Message> findByChat(Optional<MessengerUser> user, GetChatRequest request) {
+    public List<Message> loadChat(Optional<MessengerUser> user, GetChatRequest request) {
         Optional<MessengerUser> companion = userRepository.findByUsername(request.getUser());
 
-        Chat chat = chatRepository.findChatByFirstUserAndSecondUser(user.get(), companion.get());
-        List<Message> messages = messageRepository.findAllByChat(chat);
+        List<Message> messages = null;
+        if(companion.isPresent()){
+            MessengerUser u1 = user.get();
+            MessengerUser u2 = companion.get();
+            Chat chat = chatRepository.findChatByFirstUserAndSecondUser(u1, u2);
+
+            if(chat != null){
+                messages = messageRepository.findMessagesByChat(chat);
+            }else{
+                chat = chatRepository.findChatByFirstUserAndSecondUser(u2, u1);
+                if(chat != null){
+                    messages = messageRepository.findMessagesByChat(chat);
+                }
+            }
+        }
 
         return messages;
     }

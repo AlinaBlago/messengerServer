@@ -1,13 +1,19 @@
 package com.finalproject.server.controller;
 
+import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.exception.MessengerExceptions;
-import com.finalproject.server.payload.request.SignupRequest;
-import com.finalproject.server.payload.request.UpdateUserRequest;
+import com.finalproject.server.payload.request.*;
+import com.finalproject.server.payload.response.ChangeEmailResponse;
 import com.finalproject.server.payload.response.UserResponse;
 
+import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.security.properties.SecurityProperties;
+import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
+import com.finalproject.server.service.impl.UserService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +25,16 @@ public class AuthorizationController {
 
     private final UserOperations userOperations;
     private final SecurityProperties securityProperties;
+    private final UserRepository userRepository;
+    private final TokenOperations tokenOperations;
+    private final UserService userService;
 
-
-    public AuthorizationController(UserOperations userOperations, SecurityProperties securityProperties) {
+    public AuthorizationController(UserOperations userOperations, SecurityProperties securityProperties, UserRepository userRepository, TokenOperations tokenOperations, UserService userService) {
         this.userOperations = userOperations;
         this.securityProperties = securityProperties;
+        this.userRepository = userRepository;
+        this.tokenOperations = tokenOperations;
+        this.userService = userService;
     }
 
 //    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -74,14 +85,20 @@ public class AuthorizationController {
 
     @GetMapping("/me")
     public UserResponse getCurrentUser(@AuthenticationPrincipal String email) {
-        return userOperations.findByEmail(email).orElseThrow(() -> MessengerExceptions.userNotFound(email));
+        return userOperations.findByUsername(email).orElseThrow(() -> MessengerExceptions.userNotFound(email));
     }
 
     @PatchMapping("/me")
     public UserResponse mergeCurrentUser(@AuthenticationPrincipal String email,
                                          @RequestBody @Valid UpdateUserRequest request) {
-        return userOperations.updateByEmail(email, request);
+        return userOperations.updateByUsername(email, request);
     }
+
+//    @PatchMapping("/me")
+//    public UserResponse updateEmail(@AuthenticationPrincipal String email,
+//                                         @RequestBody @Valid UpdateEmailRequest request) {
+//        return userOperations.updateByUsername(email, request);
+//    }
 
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -92,6 +109,20 @@ public class AuthorizationController {
     @GetMapping("/{id}")
     public UserResponse getUserById(@PathVariable long id) {
         return userOperations.findById(id).orElseThrow(() -> MessengerExceptions.userNotFound(id));
+    }
+
+    @PostMapping(value = "/me/email", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> sendChangeEmailToken(@AuthenticationPrincipal String email, @RequestBody GetTokenForUpdateEmailRequest request) {
+        MessengerUser user = userRepository.findByUsername(email).get();
+        String token = tokenOperations.add(user ,request);
+        return ResponseEntity.ok(new ChangeEmailResponse(token));
+    }
+
+    @PostMapping(value = "/me/email/change", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changePassword(@AuthenticationPrincipal String email, @RequestBody ChangeEmailRequest request) {
+        MessengerUser user = userRepository.findByUsername(email).get();
+        userService.update(user, request);
+        return ResponseEntity.ok("Email changed successful");
     }
 
 }

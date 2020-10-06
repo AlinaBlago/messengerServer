@@ -28,11 +28,11 @@ public interface UserOperations {
 
     Optional<UserResponse> findById(long id);
 
-    Optional<UserResponse> findByEmail(String email);
+    Optional<UserResponse> findByUsername(String email);
 
     UserResponse updateById(long id, UpdateUserRequest request);
 
-    UserResponse updateByEmail(String email, UpdateUserRequest request);
+    UserResponse updateByUsername(String email, UpdateUserRequest request);
 
     UserResponse create(SignupRequest request);
 

@@ -1,5 +1,6 @@
 package com.finalproject.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -14,10 +15,12 @@ public class Role implements GrantedAuthority {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @JsonIgnore
     @Column(name = "name", nullable = false)
     @Enumerated(EnumType.STRING)
     private ERole name;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Set<MessengerUser> messengerUsers = new HashSet<MessengerUser>();
 

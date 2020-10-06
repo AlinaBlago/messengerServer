@@ -1,5 +1,6 @@
 package com.finalproject.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -14,11 +15,13 @@ public class State {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @JsonIgnore
     @NaturalId
     @Column(name = "name", nullable = false)
     @Enumerated(EnumType.STRING)
     private EState name;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "states")
     private Set<MessengerUser> messengerUsers = new HashSet<MessengerUser>();
 

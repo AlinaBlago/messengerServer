@@ -5,6 +5,7 @@ import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.entity.Role;
 import com.finalproject.server.entity.Token;
 import com.finalproject.server.exception.MessengerExceptions;
+import com.finalproject.server.payload.request.ChangeEmailRequest;
 import com.finalproject.server.payload.request.ChangePasswordRequest;
 import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.payload.request.UpdateUserRequest;
@@ -123,8 +124,8 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public Optional<UserResponse> findByEmail(String email) {
-        return userRepository.findByEmail(email).map(UserResponse::fromUser);
+    public Optional<UserResponse> findByUsername(String username) {
+        return userRepository.findByUsername(username).map(UserResponse::fromUser);
     }
 
     @Override
@@ -135,9 +136,9 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public UserResponse updateByEmail(String email, UpdateUserRequest request) {
-        MessengerUser user = userRepository.findByEmail(email)
-                .orElseThrow(() -> MessengerExceptions.userNotFound(email));
+    public UserResponse updateByUsername(String username, UpdateUserRequest request) {
+        MessengerUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(username));
         return UserResponse.fromUser(update(user, request));
 
 
@@ -196,18 +197,24 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     private MessengerUser update(MessengerUser user, UpdateUserRequest request) {
-        String email = request.getEmail();
-        if (email != null && !email.equals(user.getEmail())) {
-            if (userRepository.existsByEmail(email)) throw MessengerExceptions.duplicateEmail(email);
-            user.setEmail(email);
-        }
         String username = request.getUsername();
-        if (username != null && !username.equals(user.getUsername())) {
-            if (userRepository.existsByUsername(username)) throw MessengerExceptions.duplicateNickname(username);
-            user.setUsername(username);
+
+        if (username == null) {
+            String lastUsername = user.getUsername();
+            user.setUsername(lastUsername);
+
+        } else {
+            if (!username.equals(user.getUsername())) {
+                if (userRepository.existsByUsername(username)) throw MessengerExceptions.duplicateNickname(username);
+                user.setUsername(username);
+            }
         }
+
         String password = request.getPassword();
-        if (password != null) {
+        if (password == null) {
+            String lastPassword = user.getPassword();
+            user.setPassword(lastPassword);
+        } else {
             user.setPassword(passwordEncoder.encode(password));
         }
         return userRepository.save(user);
@@ -224,6 +231,19 @@ public class UserService implements UserOperations, UserDetailsService {
                     tokenOperations.deleteById(tokenOperations.findByValueAndUser(token.getValue(), user.get()).get().getId());
                     userRepository.save(user.get());
                 }
+        }
+    }
+
+    public void update(MessengerUser user ,ChangeEmailRequest request) {
+        Token token = tokenOperations.findByValue(request.getToken());
+
+        if (tokenOperations.findByValueAndUser(token.getValue(), user).isPresent()) {
+            String email = request.getEmail();
+
+                user.setEmail(email);
+                tokenOperations.deleteById(tokenOperations.findByValueAndUser(token.getValue(), user).get().getId());
+                userRepository.save(user);
+
         }
     }
 

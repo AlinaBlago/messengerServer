@@ -1,24 +1,20 @@
 package com.finalproject.server.controller;
 
-import com.finalproject.server.entity.Chat;
 import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.payload.request.AddChatRequest;
 import com.finalproject.server.payload.request.GetChatRequest;
 import com.finalproject.server.payload.request.SendMessageRequest;
 import com.finalproject.server.payload.response.ChatResponse;
-import com.finalproject.server.repository.ChatRepository;
-import com.finalproject.server.repository.MessageRepository;
+import com.finalproject.server.payload.response.MessageResponse;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.MessageOperations;
-import com.finalproject.server.service.UserOperations;
 import com.finalproject.server.service.impl.ChatService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,15 +24,11 @@ public class MessageController {
     private final UserRepository userRepository;
     private final MessageOperations messageOperations;
     private final ChatService chatService;
-    private final ChatRepository chatRepository;
-    private final MessageRepository messageRepository;
 
-    public MessageController(UserRepository userRepository, MessageOperations messageOperations, ChatService chatService, ChatRepository chatRepository, MessageRepository messageRepository) {
+    public MessageController(UserRepository userRepository, MessageOperations messageOperations, ChatService chatService) {
         this.userRepository = userRepository;
         this.messageOperations = messageOperations;
         this.chatService = chatService;
-        this.chatRepository = chatRepository;
-        this.messageRepository = messageRepository;
     }
 
     @PostMapping(value = "/me/chats")
@@ -74,11 +66,15 @@ public class MessageController {
     }
 
     @PostMapping(value = "/me/chat")
-    public ResponseEntity<List<Message>> getChat(@AuthenticationPrincipal String email, @RequestBody GetChatRequest request){
-        List<Message> messages = messageOperations.findByChat(userRepository.findByUsername(email), request);
+    public ResponseEntity<List<MessageResponse>> getChat(@AuthenticationPrincipal String email, @RequestBody GetChatRequest request){
+        List<Message> messages = messageOperations.loadChat(userRepository.findByUsername(email), request);
 
         if (messages != null){
-            return ResponseEntity.ok(messages);
+            List<MessageResponse> msgResp = new ArrayList<>();
+            messages.forEach(msg -> {
+                msgResp.add(new MessageResponse(msg));
+            });
+            return ResponseEntity.ok(msgResp);
         } else {
             return ResponseEntity.badRequest().body(null);
         }

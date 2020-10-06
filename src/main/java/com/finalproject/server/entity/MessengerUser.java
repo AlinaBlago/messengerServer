@@ -1,9 +1,11 @@
 package com.finalproject.server.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.time.Instant;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -17,22 +19,29 @@ public class MessengerUser {
     @Column(name = "id", nullable = false)
     private Long id;
 
+    @JsonIgnore
     @NaturalId
     @Email
     @Column(name = "email", nullable = false)
     String email;
 
+    @JsonIgnore
     @NaturalId
     @Column(name = "login", nullable = false)
     String username;
 
+    @JsonIgnore
     @Column(name = "password", nullable = false, length = 255)
     String password;
 
-
+    @JsonIgnore
     @Column(name = "enabled", nullable = false)
     boolean enabled;
 
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
@@ -43,6 +52,7 @@ public class MessengerUser {
     @MapKey(name = "name")
     private Map<ERole, Role> roles = new EnumMap<>(ERole.class);
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_states",
@@ -54,8 +64,7 @@ public class MessengerUser {
     public MessengerUser() {
     }
 
-    public MessengerUser(String email, String username, String password){
-      //  this.email = email;
+    public MessengerUser(String username, String password){
         this.username = username;
         this.password = password;
     }
@@ -116,14 +125,21 @@ public class MessengerUser {
         this.states = states;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public String toString() {
         return "User{" +
-               // "email='" + email + '\'' +
+                "email='" + email + '\'' +
                 ", login='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", isAdmin=" + enabled +
+                ", created at='" + getCreatedAt() + '\'' +
                 '}';
     }
 
