@@ -20,7 +20,7 @@ public class MessengerUser {
     private Long id;
 
     @JsonIgnore
-    @NaturalId
+    @NaturalId(mutable = true)
     @Email
     @Column(name = "email", nullable = false)
     String email;

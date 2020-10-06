@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -42,82 +43,6 @@ public class UserService implements UserOperations, UserDetailsService {
         this.tokenOperations = tokenOperations;
     }
 
-//    @Override
-//    public List<MessengerUser> findAll() {
-//        return (List<MessengerUser>) userRepository.findAll();
-//    }
-//
-//    @Override
-//    public Optional<MessengerUser> findById(Long id) {
-//        return userRepository.findById(id);
-//    }
-//
-//    @Override
-//    public void deleteById(Long id) {
-//        userRepository.deleteById(id);
-//    }
-//
-//    @Override
-//    public MessengerUser findByPasswordAndLogin(String password, String login) {
-//        return userRepository.findByUsernameAndPassword(login, password);
-//    }
-//
-//    @Override
-//    public Optional<MessengerUser> findByUsername(String username) {
-//        return userRepository.findByUsername(username);
-//    }
-//
-//    @Override
-//    public void add(MessengerUser user) {
-//        userRepository.save(user);
-//
-//    }
-//
-//    @Override
-//    public boolean existByUsername(String login) {
-//        return userRepository.existsByUsername(login);
-//    }
-//
-//    public void ban(Long id){
-////        List<User> userList = (List<User>) userRepository.findAll();
-////        userList.forEach(user -> {
-////            if(user.getId().equals(id)){
-////                user.setStates(locked);
-////            }
-////        });
-//    }
-//
-//    public void unBan(Long id){
-////        List<User> userList = (List<User>) userRepository.findAll();
-////        userList.forEach(user -> {
-////            if(user.getId().equals(id)){
-////                user.setStates(active);
-////            }
-////        });
-//    }
-//
-//    @Override
-//    public void save(MessengerUser user) {
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    public void updateAll(Iterable<MessengerUser> users) {
-//        userRepository.saveAll(users);
-//    }
-//
-//    @Override
-//    public void update(MessengerUser user) {
-//        userRepository.save(user);
-//    }
-//
-//    @Override
-//    public boolean existsByEmail(String email) {
-//        return userRepository.existsByEmail(email);
-//    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     @Override
     public Optional<UserResponse> findById(long id) {
         return userRepository.findById(id).map(UserResponse::fromUser);
@@ -131,7 +56,7 @@ public class UserService implements UserOperations, UserDetailsService {
     @Override
     public UserResponse updateById(long id, UpdateUserRequest request) {
         MessengerUser user = getUser(id);
-        return UserResponse.fromUser(update(user, request));
+        return UserResponse.fromUser(updateCurrentUserCredentials(user, request));
 
     }
 
@@ -139,7 +64,7 @@ public class UserService implements UserOperations, UserDetailsService {
     public UserResponse updateByUsername(String username, UpdateUserRequest request) {
         MessengerUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> MessengerExceptions.userNotFound(username));
-        return UserResponse.fromUser(update(user, request));
+        return UserResponse.fromUser(updateCurrentUserCredentials(user, request));
 
 
     }
@@ -171,13 +96,13 @@ public class UserService implements UserOperations, UserDetailsService {
     public void mergeAdmins(List<SignupRequest> requests) {
         if (requests.isEmpty()) return;
         Map<ERole, Role> authorities = getAdminAuthorities();
-//        var now = Instant.now();
+        var now = Instant.now();
         for (SignupRequest request : requests) {
             String email = request.getEmail();
             String username = request.getUsername();
             MessengerUser user = userRepository.findByEmail(email).orElseGet(() -> {
                 var newUser = new MessengerUser();
-//                newUser.setCreatedAt(now);
+                newUser.setCreatedAt(now);
                 newUser.setEmail(email);
                 return newUser;
             });
@@ -196,7 +121,7 @@ public class UserService implements UserOperations, UserDetailsService {
                 .orElseThrow(() -> MessengerExceptions.userNotFound(id));
     }
 
-    private MessengerUser update(MessengerUser user, UpdateUserRequest request) {
+    private MessengerUser updateCurrentUserCredentials(MessengerUser user, UpdateUserRequest request) {
         String username = request.getUsername();
 
         if (username == null) {
@@ -220,7 +145,7 @@ public class UserService implements UserOperations, UserDetailsService {
         return userRepository.save(user);
     }
 
-    public void update(ChangePasswordRequest request) {
+    public void updateForgottenPassword(ChangePasswordRequest request) {
         Optional<MessengerUser> user = userRepository.findByUsername(request.getUsername());
         Token token = tokenOperations.findByValue(request.getToken());
 
@@ -234,7 +159,7 @@ public class UserService implements UserOperations, UserDetailsService {
         }
     }
 
-    public void update(MessengerUser user ,ChangeEmailRequest request) {
+    public void updateEmail(MessengerUser user, ChangeEmailRequest request) {
         Token token = tokenOperations.findByValue(request.getToken());
 
         if (tokenOperations.findByValueAndUser(token.getValue(), user).isPresent()) {
@@ -253,7 +178,7 @@ public class UserService implements UserOperations, UserDetailsService {
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        user.setCreatedAt(Instant.now());
+        user.setCreatedAt(Instant.now());
         userRepository.save(user);
         return user;
     }

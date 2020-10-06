@@ -3,7 +3,6 @@ package com.finalproject.server.controller;
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.*;
-import com.finalproject.server.payload.response.ChangeEmailResponse;
 import com.finalproject.server.payload.response.UserResponse;
 
 import com.finalproject.server.repository.UserRepository;
@@ -21,17 +20,15 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
-public class AuthorizationController {
+public class UserController {
 
     private final UserOperations userOperations;
-    private final SecurityProperties securityProperties;
     private final UserRepository userRepository;
     private final TokenOperations tokenOperations;
     private final UserService userService;
 
-    public AuthorizationController(UserOperations userOperations, SecurityProperties securityProperties, UserRepository userRepository, TokenOperations tokenOperations, UserService userService) {
+    public UserController(UserOperations userOperations, UserRepository userRepository, TokenOperations tokenOperations, UserService userService) {
         this.userOperations = userOperations;
-        this.securityProperties = securityProperties;
         this.userRepository = userRepository;
         this.tokenOperations = tokenOperations;
         this.userService = userService;
@@ -88,18 +85,14 @@ public class AuthorizationController {
         return userOperations.findByUsername(email).orElseThrow(() -> MessengerExceptions.userNotFound(email));
     }
 
+    //TODO
     @PatchMapping("/me")
     public UserResponse mergeCurrentUser(@AuthenticationPrincipal String email,
                                          @RequestBody @Valid UpdateUserRequest request) {
         return userOperations.updateByUsername(email, request);
     }
 
-//    @PatchMapping("/me")
-//    public UserResponse updateEmail(@AuthenticationPrincipal String email,
-//                                         @RequestBody @Valid UpdateEmailRequest request) {
-//        return userOperations.updateByUsername(email, request);
-//    }
-
+    //TODO
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCurrentUser(@AuthenticationPrincipal String email) {
@@ -115,13 +108,13 @@ public class AuthorizationController {
     public ResponseEntity<?> sendChangeEmailToken(@AuthenticationPrincipal String email, @RequestBody GetTokenForUpdateEmailRequest request) {
         MessengerUser user = userRepository.findByUsername(email).get();
         String token = tokenOperations.add(user ,request);
-        return ResponseEntity.ok(new ChangeEmailResponse(token));
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping(value = "/me/email/change", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changePassword(@AuthenticationPrincipal String email, @RequestBody ChangeEmailRequest request) {
         MessengerUser user = userRepository.findByUsername(email).get();
-        userService.update(user, request);
+        userService.updateEmail(user, request);
         return ResponseEntity.ok("Email changed successful");
     }
 

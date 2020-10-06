@@ -19,7 +19,7 @@ public class UserResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private ZonedDateTime createdAt;
 
-//    private Set<ERole> roles;
+    private Set<ERole> roles;
 
 
     public UserResponse() {
@@ -31,7 +31,7 @@ public class UserResponse {
         response.email = user.getEmail();
         response.username = user.getUsername();
         response.createdAt = user.getCreatedAt().atZone(ZoneOffset.UTC);
-//        response.roles = EnumSet.copyOf(user.getRoles().keySet());
+        response.roles = EnumSet.copyOf(user.getRoles().keySet());
         return response;
     }
 
@@ -67,12 +67,12 @@ public class UserResponse {
         this.createdAt = createdAt;
     }
 
-//    public Set<ERole> getRoles() {
-//        return roles;
-//    }
-//
-//    public void setRoles(Set<ERole> roles) {
-//        this.roles = roles;
-//    }
+    public Set<ERole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<ERole> roles) {
+        this.roles = roles;
+    }
 
 }
