@@ -1,10 +1,14 @@
 package com.finalproject.server.controller;
 
-import com.finalproject.server.exception.MessengerExceptions;
+import com.finalproject.server.payload.request.AddChatRequest;
 import com.finalproject.server.payload.request.SignupRequest;
+import com.finalproject.server.payload.response.ChatResponse;
 import com.finalproject.server.payload.response.UserResponse;
+import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.UserOperations;
+import com.finalproject.server.service.impl.ChatService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,9 +19,13 @@ import javax.validation.Valid;
 public class AdminController {
 
     private final UserOperations userOperations;
+    private final ChatService chatService;
+    private final UserRepository userRepository;
 
-    public AdminController(UserOperations userOperations) {
+    public AdminController(UserOperations userOperations, ChatService chatService, UserRepository userRepository) {
         this.userOperations = userOperations;
+        this.chatService = chatService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/admins")
@@ -26,22 +34,32 @@ public class AdminController {
         return userOperations.createAdmin(request);
     }
 
-    @GetMapping("/{id}")
-    public UserResponse getUserById(@PathVariable long id) {
-        return userOperations.findById(id).orElseThrow(() -> MessengerExceptions.userNotFound(id));
+    @PostMapping(value = "/admins/chats")
+    public ResponseEntity<ChatResponse> addChat(@AuthenticationPrincipal String email, @RequestBody AddChatRequest request) {
+        ChatResponse response =  chatService.addChat(userRepository.findByUsername(email), request);
+        if (response != null){
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
-    @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void lockUser(@AuthenticationPrincipal String email) {
-        userOperations.deleteByUsername(email);
-    }
+//    @GetMapping("/{id}")
+//    public UserResponse getUserById(@PathVariable long id) {
+//        return userOperations.findById(id).orElseThrow(() -> MessengerExceptions.userNotFound(id));
+//    }
+//
+//    @PatchMapping("/{id}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void lockUser(@AuthenticationPrincipal String email) {
+//        userOperations.deleteByUsername(email);
+//    }
 
-    @PatchMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void unLockCurrentUser(@AuthenticationPrincipal String email) {
-        userOperations.deleteByUsername(email);
-    }
+//    @GetMapping("/{id}")
+//    @ResponseStatus(HttpStatus.NO_CONTENT)
+//    public void unLockCurrentUser(@AuthenticationPrincipal String email) {
+//        userOperations.deleteByUsername(email);
+//    }
 
 //    @RequestMapping(value = "/loadUsersForAdmin" , method = RequestMethod.GET,
 //            produces = MediaType.APPLICATION_JSON_VALUE)

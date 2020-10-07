@@ -75,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // allow user registration
                 .antMatchers(HttpMethod.POST, "/users", "/password/**").permitAll()
                 // admin can register new admins
-                .antMatchers(HttpMethod.POST, "/users/admins").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/users/admins/**").hasRole("ADMIN")
                 // regular users can view basic user info for other users
                 .antMatchers(HttpMethod.GET,"/users/{id:\\d+}").authenticated()
                 // admin can manage users by id
@@ -86,7 +86,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 // login filter
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), securityProperties.getJwt(), objectMapper))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), securityProperties.getJwt(), objectMapper, userService))
                 // jwt-verification filter
                 .addFilter(new JWTAuthorizationFilter(authenticationManager(), securityProperties.getJwt()))
                 // for unauthorized requests return 401

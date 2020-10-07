@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.server.payload.request.LoginRequest;
 import com.finalproject.server.security.SecurityConstants;
 import com.finalproject.server.security.properties.JWTProperties;
+import com.finalproject.server.service.impl.UserService;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,8 +29,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final ObjectMapper objectMapper;
 
-    public JWTAuthenticationFilter( AuthenticationManager authenticationManager, JWTProperties jwtProperties, ObjectMapper objectMapper)
+    private final UserService userService;
+
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTProperties jwtProperties, ObjectMapper objectMapper, UserService userService)
     {
+        this.userService = userService;
         setAuthenticationManager(authenticationManager);
         setUsernameParameter("login");
 
@@ -41,6 +44,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
         LoginRequest credentials;
+
         try {
             credentials = objectMapper.readValue(req.getInputStream(), LoginRequest.class);
         } catch (IOException e) {
@@ -50,6 +54,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 credentials.getUsername(),
                 credentials.getPassword()
         );
+        check(userService.loadUserByUsername(credentials.getUsername()));
+
         return getAuthenticationManager().authenticate(authToken);
     }
 
@@ -69,5 +75,27 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         res.addHeader(HttpHeaders.AUTHORIZATION, SecurityConstants.AUTH_TOKEN_PREFIX + token);
     }
+
+    public void check(UserDetails user) {
+        if (user.isAccountNonLocked()) {
+            logger.debug("User account is locked");
+            throw new LockedException(messages.getMessage(
+                    "AbstractUserDetailsAuthenticationProvider.locked",
+                    "User account is locked"));
+        }
+        if (user.isEnabled()) {
+            logger.debug("User account is disabled");
+            throw new DisabledException(messages.getMessage(
+                    "AbstractUserDetailsAuthenticationProvider.disabled",
+                    "User is disabled"));
+        }
+        if (!user.isAccountNonExpired()) {
+            logger.debug("User account is expired");
+            throw new AccountExpiredException(messages.getMessage(
+                    "AbstractUserDetailsAuthenticationProvider.expired",
+                    "User account has expired"));
+        }
+    }
 }
+
 

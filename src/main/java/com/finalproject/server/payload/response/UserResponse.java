@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.finalproject.server.entity.ERole;
 import com.finalproject.server.entity.MessengerUser;
 
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
@@ -22,11 +22,11 @@ public class UserResponse {
 
     private Set<ERole> roles;
 
-
     public UserResponse() {
     }
 
     public static UserResponse fromUser(MessengerUser user) {
+      //  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd G 'at' HH:mm:ss z");
         var response = new UserResponse();
         response.id = user.getId();
         response.email = user.getEmail();

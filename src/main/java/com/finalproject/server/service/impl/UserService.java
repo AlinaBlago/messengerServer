@@ -7,11 +7,10 @@ import com.finalproject.server.payload.request.ChangePasswordRequest;
 import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.payload.request.UpdateUserRequest;
 import com.finalproject.server.payload.response.UserResponse;
-import com.finalproject.server.repository.RoleRepository;
-import com.finalproject.server.repository.StateRepository;
-import com.finalproject.server.repository.UserRepository;
+import com.finalproject.server.repository.*;
 import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,20 +26,24 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class UserService implements UserOperations, UserDetailsService {
+public class UserService implements UserOperations, UserDetailsService, UserDetails {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final TokenOperations tokenOperations;
     private final StateRepository stateRepository;
+    private final MessageRepository messageRepository;
+    private final ChatRepository chatRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, TokenOperations tokenOperations, StateRepository stateRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, TokenOperations tokenOperations, StateRepository stateRepository, MessageRepository messageRepository, ChatRepository chatRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.tokenOperations = tokenOperations;
         this.stateRepository = stateRepository;
+        this.messageRepository = messageRepository;
+        this.chatRepository = chatRepository;
     }
 
     @Override
@@ -92,6 +95,16 @@ public class UserService implements UserOperations, UserDetailsService {
     public void deleteByUsername(String username) {
         MessengerUser user = userRepository.findByUsername(username).get();
         user.setStates(getDeletedUserStates());
+        loadUserByUsername(username).isEnabled();
+//        List<Chat> chats = chatRepository.findChatsByFirstUser(user);
+//        for (Chat chat: chats){
+//            List<Message> messages = messageRepository.findMessagesByChat(chat);
+//            for (Message message: messages){
+//                messageRepository.delete(message);
+//            }
+//            chatRepository.delete(chat);
+//        }
+
     }
 
     public void mergeAdmins(List<SignupRequest> requests) {
@@ -221,12 +234,12 @@ public class UserService implements UserOperations, UserDetailsService {
         return states;
     }
 
-    private Map<EState, State> getActiveUserStates() {
+    private Map<EState, State> getLockedUserStates() {
         State state = stateRepository
-                .findByName(EState.ACTIVE)
-                .orElseThrow(() -> MessengerExceptions.stateNotFound(EState.ACTIVE.name()));
+                .findByName(EState.LOCKED)
+                .orElseThrow(() -> MessengerExceptions.stateNotFound(EState.LOCKED.name()));
         Map<EState, State> states = new EnumMap<>(EState.class);
-        states.put(EState.ACTIVE, state);
+        states.put(EState.LOCKED, state);
         return states;
     }
 
@@ -260,4 +273,47 @@ public class UserService implements UserOperations, UserDetailsService {
         return new User(user.getUsername(), user.getPassword(), roles);
     }
 
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+
+    public void lockByUsername(String username) {
+        MessengerUser user = userRepository.findByUsername(username).get();
+        user.setStates(getLockedUserStates());
+        loadUserByUsername(username).isAccountNonLocked();
+
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
 }
