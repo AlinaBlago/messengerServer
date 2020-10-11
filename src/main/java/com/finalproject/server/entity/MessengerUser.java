@@ -2,16 +2,14 @@ package com.finalproject.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -28,7 +26,7 @@ public class MessengerUser {
     String email;
 
     @JsonIgnore
-    @NaturalId
+    @NaturalId(mutable = true)
     @Column(name = "login", nullable = false)
     String username;
 
@@ -41,7 +39,7 @@ public class MessengerUser {
     boolean enabled;
 
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    private OffsetDateTime createdAt;
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -129,11 +127,11 @@ public class MessengerUser {
         this.states = states;
     }
 
-    public Instant getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

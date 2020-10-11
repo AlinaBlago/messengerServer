@@ -2,7 +2,7 @@ package com.finalproject.server.service.impl;
 
 import com.finalproject.server.entity.Chat;
 import com.finalproject.server.entity.MessengerUser;
-import com.finalproject.server.payload.request.AddChatRequest;
+import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.response.ChatResponse;
 import com.finalproject.server.repository.ChatRepository;
 import com.finalproject.server.repository.UserRepository;
@@ -48,7 +48,7 @@ public class ChatService implements ChatOperations {
     }
 
     @Override
-    public ChatResponse addChat(Optional<MessengerUser> user, AddChatRequest request) {
+    public ChatResponse addChat(Optional<MessengerUser> user, UserRequest request) {
         MessengerUser msgUser = user.get();
         Optional<MessengerUser> secondUser = userRepository.findByUsername(request.getUsername());
 

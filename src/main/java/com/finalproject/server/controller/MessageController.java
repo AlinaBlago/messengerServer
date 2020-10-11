@@ -1,22 +1,30 @@
 package com.finalproject.server.controller;
 
+import com.finalproject.server.entity.Chat;
 import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.MessengerUser;
-import com.finalproject.server.payload.request.AddChatRequest;
-import com.finalproject.server.payload.request.GetChatRequest;
+import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.request.SendMessageRequest;
 import com.finalproject.server.payload.response.ChatResponse;
 import com.finalproject.server.payload.response.MessageResponse;
+import com.finalproject.server.repository.ChatRepository;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.MessageOperations;
 import com.finalproject.server.service.impl.ChatService;
+import com.google.gson.Gson;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/users")
@@ -24,15 +32,17 @@ public class MessageController {
     private final UserRepository userRepository;
     private final MessageOperations messageOperations;
     private final ChatService chatService;
+    private final ChatRepository chatRepository;
 
-    public MessageController(UserRepository userRepository, MessageOperations messageOperations, ChatService chatService) {
+    public MessageController(UserRepository userRepository, MessageOperations messageOperations, ChatService chatService, ChatRepository chatRepository) {
         this.userRepository = userRepository;
         this.messageOperations = messageOperations;
         this.chatService = chatService;
+        this.chatRepository = chatRepository;
     }
 
     @PostMapping(value = "/me/chats")
-    public ResponseEntity<ChatResponse> addChat(@AuthenticationPrincipal String email, @RequestBody AddChatRequest request) {
+    public ResponseEntity<ChatResponse> addChat(@AuthenticationPrincipal String email, @RequestBody UserRequest request) {
         ChatResponse response =  chatService.addChat(userRepository.findByUsername(email), request);
         if (response != null){
             return ResponseEntity.ok(response);
@@ -55,18 +65,16 @@ public class MessageController {
     }
 
     @PostMapping(value = "/me/messages")
-    public ResponseEntity sendMessage(@AuthenticationPrincipal String email, @RequestBody SendMessageRequest request) {
+    public MessageResponse sendMessage(@AuthenticationPrincipal String email, @RequestBody SendMessageRequest request) {
         Message message = messageOperations.add(userRepository.findByUsername(email), request);
 
-        if (message == null) {
-            return ResponseEntity.badRequest().body(null);
-        } else {
-            return ResponseEntity.ok("Ok");
-        }
+        MessageResponse resp = new MessageResponse(message);
+
+        return resp;
     }
 
     @PostMapping(value = "/me/chat")
-    public ResponseEntity<List<MessageResponse>> getChat(@AuthenticationPrincipal String email, @RequestBody GetChatRequest request){
+    public ResponseEntity<List<MessageResponse>> getChat(@AuthenticationPrincipal String email, @RequestBody UserRequest request){
         List<Message> messages = messageOperations.loadChat(userRepository.findByUsername(email), request);
 
         if (messages != null){
@@ -80,31 +88,44 @@ public class MessageController {
         }
     }
 
-//    @RequestMapping(value = "/isUserExists" , method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity isUserExists(String senderLogin, String userLogin){
-//
-//        if (userOperations.findByUsername(senderLogin).isPresent())
-//            if(userOperations.existByUsername(userLogin)) {
-//
-//               return new  ResponseEntity(HttpStatus.OK);
-//            }
-//
-//        return new  ResponseEntity(HttpStatus.CONFLICT);
-//    }
+    @GetMapping("/me/newMessages")
+    public SseEmitter streamSseMvc(@AuthenticationPrincipal String email) {
+        System.out.println("Connected " + email);
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
-//    @RequestMapping(value = "/haveNewMessages" , method = RequestMethod.GET,
-//            produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity haveNewMessages(Long senderId, String login){
-//
-//        if(userOperations.findByUsername(login).isPresent()) {
-//            List<Message> messages = messageOperations.getNewMessages(senderId);
-//
-//            return new  ResponseEntity(HttpStatus.OK);
-//        }
-//
-//        return new  ResponseEntity(HttpStatus.CONFLICT);
-//    }
+        Optional<MessengerUser> user = userRepository.findByUsername(email);
+        List<Chat> chats = chatService.findChats(user.get());
+
+        ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
+        sseMvcExecutor.execute(() -> {
+            Thread t1 = new Thread(()->{
+                Gson gson = new Gson();
+                for (int i = 0; true ; i++) {
+                    chats.forEach(chat -> {
+                        try {
+                            List<MessageResponse> messages = messageOperations.getNewMessages(chat , user.get());
+
+                            if(!messages.isEmpty()) {
+                                String jsonReq = gson.toJson(messages);
+                                SseEmitter.SseEventBuilder event = SseEmitter.event()
+                                        .data(jsonReq);
+
+                                emitter.send(event);
+                            }
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                            emitter.completeWithError(e);
+                        }
+                    });
+
+                }
+            });
+            t1.start();
+
+        });
+        sseMvcExecutor.shutdown();
+        return emitter;
+    }
 
 
 }

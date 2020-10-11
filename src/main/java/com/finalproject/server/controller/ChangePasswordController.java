@@ -1,7 +1,7 @@
 package com.finalproject.server.controller;
 
 import com.finalproject.server.payload.request.ChangePasswordRequest;
-import com.finalproject.server.payload.request.SendChangePasswordTokenRequest;
+import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.response.ChangePasswordResponse;
 import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.impl.UserService;
@@ -22,7 +22,7 @@ public class ChangePasswordController {
     }
 
     @PostMapping(value = "/password", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> sendChangePasswordToken(@RequestBody SendChangePasswordTokenRequest request) {
+    public ResponseEntity<?> sendChangePasswordToken(@RequestBody UserRequest request) {
         String token = tokenOperations.add(request);
         return ResponseEntity.ok(new ChangePasswordResponse(token, request.getUsername()));
     }

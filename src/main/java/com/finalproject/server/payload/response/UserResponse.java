@@ -5,6 +5,7 @@ import com.finalproject.server.entity.ERole;
 import com.finalproject.server.entity.MessengerUser;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.EnumSet;
@@ -18,7 +19,7 @@ public class UserResponse {
     private String username;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
-    private ZonedDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     private Set<ERole> roles;
 
@@ -31,7 +32,7 @@ public class UserResponse {
         response.id = user.getId();
         response.email = user.getEmail();
         response.username = user.getUsername();
-        response.createdAt = user.getCreatedAt().atZone(ZoneOffset.UTC);
+        response.createdAt = user.getCreatedAt();
         response.roles = EnumSet.copyOf(user.getRoles().keySet());
         return response;
     }
@@ -60,11 +61,11 @@ public class UserResponse {
         this.username = username;
     }
 
-    public ZonedDateTime getCreatedAt() {
+    public OffsetDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(ZonedDateTime createdAt) {
+    public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
     }
 

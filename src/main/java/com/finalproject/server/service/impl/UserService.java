@@ -2,15 +2,11 @@ package com.finalproject.server.service.impl;
 
 import com.finalproject.server.entity.*;
 import com.finalproject.server.exception.MessengerExceptions;
-import com.finalproject.server.payload.request.ChangeEmailRequest;
-import com.finalproject.server.payload.request.ChangePasswordRequest;
-import com.finalproject.server.payload.request.SignupRequest;
-import com.finalproject.server.payload.request.UpdateUserRequest;
+import com.finalproject.server.payload.request.*;
 import com.finalproject.server.payload.response.UserResponse;
 import com.finalproject.server.repository.*;
 import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,36 +15,27 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class UserService implements UserOperations, UserDetailsService, UserDetails {
+public class UserService implements UserOperations, UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final TokenOperations tokenOperations;
     private final StateRepository stateRepository;
-    private final MessageRepository messageRepository;
-    private final ChatRepository chatRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, TokenOperations tokenOperations, StateRepository stateRepository, MessageRepository messageRepository, ChatRepository chatRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, TokenOperations tokenOperations, StateRepository stateRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
         this.tokenOperations = tokenOperations;
         this.stateRepository = stateRepository;
-        this.messageRepository = messageRepository;
-        this.chatRepository = chatRepository;
-    }
-
-    @Override
-    public Optional<UserResponse> findById(long id) {
-        return userRepository.findById(id).map(UserResponse::fromUser);
     }
 
     @Override
@@ -57,17 +44,19 @@ public class UserService implements UserOperations, UserDetailsService, UserDeta
     }
 
     @Override
-    public UserResponse updateById(long id, UpdateUserRequest request) {
-        MessengerUser user = getUser(id);
-        return UserResponse.fromUser(updateCurrentUserCredentials(user, request));
+    public UserResponse updateUsername(String username, UpdateUserLoginRequest request) {
+        MessengerUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(username));
+        return UserResponse.fromUser(updateCurrentUserLogin(user, request));
+
 
     }
 
     @Override
-    public UserResponse updateByUsername(String username, UpdateUserRequest request) {
+    public UserResponse updatePassword(String username, UpdateUserPasswordRequest request) {
         MessengerUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> MessengerExceptions.userNotFound(username));
-        return UserResponse.fromUser(updateCurrentUserCredentials(user, request));
+        return UserResponse.fromUser(updateCurrentUserPassword(user, request));
 
 
     }
@@ -87,47 +76,55 @@ public class UserService implements UserOperations, UserDetailsService, UserDeta
     }
 
     @Override
-    public void deleteById(long id) {
-        userRepository.deleteById(id);
+    public UserDetails deleteByUsername(String username) throws UsernameNotFoundException {
+        MessengerUser user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
+
+        user.setStates(getDeletedUserStates());
+//        List<Chat> chats = chatRepository.findChatsByFirstUser(user);
+//        for (Chat chat: chats) {
+//            messageRepository.deleteMessagesByChat(chat);
+//
+//        }
+
+        try{
+            return loadUserByUsername(username);
+        }
+        finally {
+            user.setEnabled(false);
+            userRepository.save(user);
+        }
     }
 
     @Override
-    public void deleteByUsername(String username) {
-        MessengerUser user = userRepository.findByUsername(username).get();
-        user.setStates(getDeletedUserStates());
-        loadUserByUsername(username).isEnabled();
-//        List<Chat> chats = chatRepository.findChatsByFirstUser(user);
-//        for (Chat chat: chats){
-//            List<Message> messages = messageRepository.findMessagesByChat(chat);
-//            for (Message message: messages){
-//                messageRepository.delete(message);
-//            }
-//            chatRepository.delete(chat);
-//        }
+    public UserDetails lockByUsername(UserRequest request) throws UsernameNotFoundException {
+        MessengerUser user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User " + request.getUsername() + " not found"));
+
+        user.setStates(getLockedUserStates());
+
+        try {
+            return loadUserByUsername(request.getUsername());
+        }
+        finally {
+            user.setEnabled(false);
+            userRepository.save(user);
+        }
+
 
     }
 
-    public void mergeAdmins(List<SignupRequest> requests) {
-        if (requests.isEmpty()) return;
-        Map<ERole, Role> authorities = getAdminAuthorities();
-        var now = Instant.now();
-        for (SignupRequest request : requests) {
-            String email = request.getEmail();
-            String username = request.getUsername();
-            MessengerUser user = userRepository.findByEmail(email).orElseGet(() -> {
-                var newUser = new MessengerUser();
-                newUser.setCreatedAt(now);
-                newUser.setEmail(email);
-                return newUser;
-            });
-            if (!username.equals(user.getUsername())) {
-                if (userRepository.existsByUsername(username)) throw MessengerExceptions.duplicateNickname(username);
-                user.setUsername(username);
-            }
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.getRoles().putAll(authorities);
-            userRepository.save(user);
-        }
+    @Override
+    public UserDetails unLockByUsername(UserRequest request) throws UsernameNotFoundException {
+        MessengerUser user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User " + request.getUsername() + " not found"));
+
+        user.setStates(getUnactiveUserStates());
+
+        user.setEnabled(true);
+        userRepository.save(user);
+        return loadUserByUsername(request.getUsername());
+
     }
 
     private MessengerUser getUser(long id) {
@@ -135,27 +132,22 @@ public class UserService implements UserOperations, UserDetailsService, UserDeta
                 .orElseThrow(() -> MessengerExceptions.userNotFound(id));
     }
 
-    private MessengerUser updateCurrentUserCredentials(MessengerUser user, UpdateUserRequest request) {
+    private MessengerUser updateCurrentUserLogin(MessengerUser user, UpdateUserLoginRequest request) {
         String username = request.getUsername();
 
-        if (username == null) {
-            String lastUsername = user.getUsername();
-            user.setUsername(lastUsername);
+        if (userRepository.existsByUsername(username)) throw MessengerExceptions.duplicateNickname(username);
 
-        } else {
-            if (!username.equals(user.getUsername())) {
-                if (userRepository.existsByUsername(username)) throw MessengerExceptions.duplicateNickname(username);
-                user.setUsername(username);
-            }
-        }
-
+        user.setUsername(username);
+        return userRepository.save(user);
+    }
+    private MessengerUser updateCurrentUserPassword(MessengerUser user, UpdateUserPasswordRequest request) {
         String password = request.getPassword();
-        if (password == null) {
-            String lastPassword = user.getPassword();
-            user.setPassword(lastPassword);
-        } else {
-            user.setPassword(passwordEncoder.encode(password));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw MessengerExceptions.wrongPassword();
         }
+
+        user.setPassword(passwordEncoder.encode(password));
         return userRepository.save(user);
     }
 
@@ -192,8 +184,9 @@ public class UserService implements UserOperations, UserDetailsService, UserDeta
         user.setStates(states);
         user.setEmail(request.getEmail());
         user.setUsername(request.getUsername());
+        user.setEnabled(true);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setCreatedAt(Instant.now());
+        user.setCreatedAt(OffsetDateTime.now());
         userRepository.save(user);
         return user;
     }
@@ -270,50 +263,11 @@ public class UserService implements UserOperations, UserDetailsService, UserDeta
 
         Set<ERole> roles = EnumSet.copyOf(user.getRoles().keySet());
 
+        if(!user.isEnabled()){
+            throw new UsernameNotFoundException("User " + username + " not found");
+        }
+
         return new User(user.getUsername(), user.getPassword(), roles);
     }
 
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return null;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-
-    public void lockByUsername(String username) {
-        MessengerUser user = userRepository.findByUsername(username).get();
-        user.setStates(getLockedUserStates());
-        loadUserByUsername(username).isAccountNonLocked();
-
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
 }

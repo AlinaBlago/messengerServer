@@ -3,6 +3,7 @@ package com.finalproject.server.controller;
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.*;
+import com.finalproject.server.payload.response.FindUserResponse;
 import com.finalproject.server.payload.response.UserResponse;
 
 import com.finalproject.server.repository.UserRepository;
@@ -16,6 +17,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -44,17 +48,22 @@ public class UserController {
         return userOperations.findByUsername(email).orElseThrow(() -> MessengerExceptions.userNotFound(email));
     }
 
-    //TODO
-    @PatchMapping("/me")
-    public UserResponse mergeCurrentUser(@AuthenticationPrincipal String email,
-                                         @RequestBody @Valid UpdateUserRequest request) {
-        return userOperations.updateByUsername(email, request);
+    @PatchMapping("/me/login")
+    public UserResponse updateUsername(@AuthenticationPrincipal String email,
+                                         @RequestBody @Valid UpdateUserLoginRequest request) {
+        return userOperations.updateUsername(email, request);
+    }
+
+    @PatchMapping("/me/password")
+    public UserResponse updatePassword(@AuthenticationPrincipal String email,
+                                         @RequestBody @Valid UpdateUserPasswordRequest request) {
+        return userOperations.updatePassword(email, request);
     }
 
     @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCurrentUser(@AuthenticationPrincipal String email) {
-        userOperations.deleteByUsername(email);
+       userOperations.deleteByUsername(email);
     }
 
     @PostMapping(value = "/me/email", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,6 +80,18 @@ public class UserController {
         return ResponseEntity.ok("Email changed successful");
     }
 
+    @PostMapping(value = "/find")
+    public FindUserResponse findUser(@RequestBody UserRequest request){
+
+        List<MessengerUser> users = userRepository.findMessengerUsersByUsernameIsStartingWith(request.getUsername());
+
+        ArrayList<String> usernames = new ArrayList<>();
+        users.forEach(user ->{
+            usernames.add(user.getUsername());
+        });
+
+        return new FindUserResponse(usernames);
+    }
 }
 
 

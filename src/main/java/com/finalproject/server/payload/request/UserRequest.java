@@ -1,12 +1,15 @@
 package com.finalproject.server.payload.request;
 
-public class AddChatRequest {
+import javax.validation.constraints.NotBlank;
+
+public class UserRequest {
+    @NotBlank
     private String username;
 
-    public AddChatRequest() {
+    public UserRequest() {
     }
 
-    public AddChatRequest(String username) {
+    public UserRequest(@NotBlank  String username) {
         this.username = username;
     }
 
@@ -18,10 +21,4 @@ public class AddChatRequest {
         this.username = username;
     }
 
-    @Override
-    public String toString() {
-        return "AddChatRequest{" +
-                "login='" + username + '\'' +
-                '}';
-    }
 }

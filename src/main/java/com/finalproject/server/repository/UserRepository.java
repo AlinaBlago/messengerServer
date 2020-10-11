@@ -3,6 +3,7 @@ package com.finalproject.server.repository;
 import com.finalproject.server.entity.MessengerUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<MessengerUser, Long> {
@@ -13,5 +14,6 @@ public interface UserRepository extends JpaRepository<MessengerUser, Long> {
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
     void deleteMessengerUserByUsername(String username);
+    List<MessengerUser> findMessengerUsersByUsernameIsStartingWith(String username);
 
 }

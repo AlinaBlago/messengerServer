@@ -46,15 +46,9 @@ public class MessengerExceptions {
         return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File storage operation failed", cause);
     }
 
-//    public static ResponseStatusException noAccessRightsToFile(String subjectEmail, Long fileId) {
-//        return new ResponseStatusException(HttpStatus.FORBIDDEN,
-//                "User " + subjectEmail + " has no access rights to file " + fileId);
-//    }
-//
-//    public static ResponseStatusException noEditingRightsToFile(String subjectEmail, Long fileId) {
-//        return new ResponseStatusException(HttpStatus.FORBIDDEN,
-//                "User " + subjectEmail + " has no editing rights to file " + fileId);
-//    }
+    public static ResponseStatusException wrongPassword() {
+        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is incorrect");
+    }
 
 
 }

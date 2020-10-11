@@ -1,6 +1,7 @@
 package com.finalproject.server.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.security.filters.JWTAuthenticationFilter;
 import com.finalproject.server.security.filters.JWTAuthorizationFilter;
 import com.finalproject.server.security.properties.JWTProperties;
@@ -44,12 +45,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public SecurityConfig(
             SecurityProperties securityProperties,
-            UserService userService,
-            PasswordEncoder passwordEncoder,
+            UserService userService1, PasswordEncoder passwordEncoder,
             ObjectMapper objectMapper
     ) {
         this.securityProperties = securityProperties;
-        this.userService = userService;
+        this.userService = userService1;
         this.passwordEncoder = passwordEncoder;
         this.objectMapper = objectMapper;
     }
@@ -76,6 +76,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/users", "/password/**").permitAll()
                 // admin can register new admins
                 .antMatchers(HttpMethod.POST, "/users/admins/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PATCH, "/users/admins").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/users/admins/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PATCH, "/users/me/**").hasRole("USER")
+
                 // regular users can view basic user info for other users
                 .antMatchers(HttpMethod.GET,"/users/{id:\\d+}").authenticated()
                 // admin can manage users by id
@@ -86,7 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 // login filter
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), securityProperties.getJwt(), objectMapper, userService))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), securityProperties.getJwt(), objectMapper))
                 // jwt-verification filter
                 .addFilter(new JWTAuthorizationFilter(authenticationManager(), securityProperties.getJwt()))
                 // for unauthorized requests return 401

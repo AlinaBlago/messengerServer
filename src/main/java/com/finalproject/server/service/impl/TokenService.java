@@ -4,14 +4,11 @@ import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.entity.Token;
 import com.finalproject.server.mail.MailService;
 import com.finalproject.server.payload.request.GetTokenForUpdateEmailRequest;
-import com.finalproject.server.payload.request.SendChangePasswordTokenRequest;
-import com.finalproject.server.payload.response.ChangePasswordResponse;
-import com.finalproject.server.payload.response.MessageResponse;
+import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.repository.TokenRepository;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.security.token.CustomToken;
 import com.finalproject.server.service.TokenOperations;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +44,7 @@ public class TokenService implements TokenOperations {
     }
 
     @Override
-    public String add(SendChangePasswordTokenRequest request) {
+    public String add(UserRequest request) {
         String token = CustomToken.getToken();
         MessengerUser user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User " + request.getUsername() + " not found"));

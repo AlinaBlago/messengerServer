@@ -4,17 +4,18 @@ package com.finalproject.server.service.impl;
 import com.finalproject.server.entity.Chat;
 import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.MessengerUser;
-import com.finalproject.server.payload.request.GetChatRequest;
 import com.finalproject.server.payload.request.SendMessageRequest;
+import com.finalproject.server.payload.request.UserRequest;
+import com.finalproject.server.payload.response.MessageResponse;
 import com.finalproject.server.repository.ChatRepository;
 import com.finalproject.server.repository.MessageRepository;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.MessageOperations;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -71,8 +72,8 @@ public class MessageService implements MessageOperations {
     }
 
     @Override
-    public List<Message> loadChat(Optional<MessengerUser> user, GetChatRequest request) {
-        Optional<MessengerUser> companion = userRepository.findByUsername(request.getUser());
+    public List<Message> loadChat(Optional<MessengerUser> user, UserRequest request) {
+        Optional<MessengerUser> companion = userRepository.findByUsername(request.getUsername());
 
         List<Message> messages = null;
         if(companion.isPresent()){
@@ -93,12 +94,27 @@ public class MessageService implements MessageOperations {
         return messages;
     }
 
+    @Override
+    public List<MessageResponse> getNewMessages(Chat chat , MessengerUser receiver ){
+        List<Message> messages = messageRepository.findMessagesByChat(chat);
+        messages = messages.stream().filter(msg -> {
+            return msg.isReceived() == false &&  !msg.getSender().getUsername().equals(receiver.getUsername());
+        }).collect(Collectors.toList());
 
-//    @Override
-//    public List<Message> getNewMessages(Long receiverId) {
-//        List<Message> receiverMessages = messageRepository.getMessagesByReceiver_Id(receiverId);
-//        return receiverMessages.stream().filter(message -> message.isRead() == false).collect(Collectors.toList());
-//    }
+        try{
+            List<MessageResponse> msgResp = new ArrayList<>();
+            messages.forEach(msg -> {
+                msgResp.add(new MessageResponse(msg)) ;
+            });
+            return msgResp;
+        }
+        finally {
+            messages.forEach(msg -> {
+                msg.setReceived(true);
+                messageRepository.save(msg);
+            });
+        }
+    }
 
 //    @Override
 //    public List<Message> getChat(Long receiverId, Long senderId) {

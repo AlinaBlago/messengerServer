@@ -29,6 +29,9 @@ public class Message {
     @Column(name = "is_read", nullable = false)
     boolean isRead;
 
+    @Column(name = "is_received")
+    boolean isReceived;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_chat", nullable = false)
     Chat chat;
@@ -36,11 +39,12 @@ public class Message {
     public Message() {
     }
 
-    public Message(String body, MessengerUser sender, Date date, boolean isRead, Chat id_chat){
+    public Message(String body, MessengerUser sender, Date date, boolean isRead, boolean isReceived, Chat id_chat){
         this.body = body;
         this.sender = sender;
         this.date = date;
         this.isRead = isRead;
+        this.isReceived = isReceived;
         this.chat = id_chat;
     }
 
@@ -90,6 +94,14 @@ public class Message {
 
     public void setRead(boolean read) {
         isRead = read;
+    }
+
+    public boolean isReceived() {
+        return isReceived;
+    }
+
+    public void setReceived(boolean received) {
+        isReceived = received;
     }
 
     public Chat getChat() {
