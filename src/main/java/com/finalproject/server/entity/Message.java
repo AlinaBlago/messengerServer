@@ -15,7 +15,7 @@ public class Message {
     @Column(name = "body", nullable = false)
     String body;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_sender", nullable = false)
     MessengerUser sender;
 
@@ -32,7 +32,7 @@ public class Message {
     @Column(name = "is_received")
     boolean isReceived;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_chat", nullable = false)
     Chat chat;
 

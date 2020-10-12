@@ -13,7 +13,7 @@ public class MessageResponse {
     public MessageResponse() {
     }
     public MessageResponse(Message msg){
-        this.chatId = msg.getChat().getId();
+//        this.chatId = msg.getChat().getId();
         this.date = msg.getDate();
         this.message = msg.getBody();
         this.senderLogin = msg.getSender().getUsername();

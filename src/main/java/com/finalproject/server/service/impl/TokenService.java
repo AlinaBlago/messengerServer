@@ -29,18 +29,8 @@ public class TokenService implements TokenOperations {
     }
 
     @Override
-    public Optional<Token> findById(Long id) {
-        return tokenRepository.findById(id);
-    }
-
-    @Override
     public void deleteById(Long id) {
         tokenRepository.deleteById(id);
-    }
-
-    @Override
-    public void updateAll(Iterable<Token> tokens) {
-        tokenRepository.saveAll(tokens);
     }
 
     @Override

@@ -11,7 +11,7 @@ import javax.annotation.PreDestroy;
 import java.io.IOException;
 
 @SpringBootApplication
-public class MessengerServerApplication implements WebMvcConfigurer {
+public class MessengerServerApplication implements WebMvcConfigurer{
 
     public static void main(String[] args)  {
         SpringApplication.run(MessengerServerApplication.class, args);

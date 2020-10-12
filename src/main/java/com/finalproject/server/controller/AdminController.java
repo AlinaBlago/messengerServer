@@ -1,9 +1,12 @@
 package com.finalproject.server.controller;
 
+import com.finalproject.server.entity.ERole;
 import com.finalproject.server.entity.MessengerUser;
+import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.request.SignupRequest;
 import com.finalproject.server.payload.response.ChatResponse;
+import com.finalproject.server.payload.response.FindUserResponse;
 import com.finalproject.server.payload.response.UserResponse;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.UserOperations;
@@ -14,11 +17,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/users/admins")
 public class AdminController {
-
     private final UserOperations userOperations;
     private final UserRepository userRepository;
 
@@ -27,44 +31,51 @@ public class AdminController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/admins")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse registerAdmin(@RequestBody @Valid SignupRequest request) {
         return userOperations.createAdmin(request);
     }
 
-    @PostMapping(value = "/admins/chats")
+    @PostMapping(value = "/chats")
     public ResponseEntity<UserResponse> getUserByUsername(@RequestBody UserRequest request) {
-        MessengerUser user = userRepository.findByUsername(request.getUsername()).get();
+        MessengerUser user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> MessengerExceptions.userNotFound(request.getUsername()));
         UserResponse response = new UserResponse();
         response.setUsername(user.getUsername());
         response.setCreatedAt(user.getCreatedAt());
         response.setEmail(user.getEmail());
 
-        if (response != null){
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.badRequest().body(null);
-        }
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/admins")
+    @PostMapping(value = "/find")
+    public FindUserResponse findUser(@RequestBody UserRequest request){
+        List<MessengerUser> users = userRepository.findMessengerUsersByUsernameIsStartingWith(request.getUsername());
+        ArrayList<String> usernames = new ArrayList<>();
+        users.forEach(user ->{
+            usernames.add(user.getUsername());
+        });
+
+        return new FindUserResponse(usernames);
+    }
+
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity deleteUser(@RequestBody UserRequest request) {
+    public ResponseEntity<String> deleteUser(@RequestBody UserRequest request) {
         userOperations.deleteByUsername(request.getUsername());
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/admins")
+    @PatchMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity lockUser(@RequestBody UserRequest request) {
+    public ResponseEntity<String> lockUser(@RequestBody UserRequest request) {
         userOperations.lockByUsername(request);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/admins/unlock")
+    @PostMapping("/unlock")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity unLockCurrentUser(@RequestBody UserRequest request) {
+    public ResponseEntity<String> unLockCurrentUser(@RequestBody UserRequest request) {
         userOperations.unLockByUsername(request);
         return ResponseEntity.ok().build();
     }

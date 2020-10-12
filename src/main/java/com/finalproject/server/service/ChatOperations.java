@@ -9,13 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatOperations {
-    Iterable<Chat> findAll();
-    Optional<Chat> findById(Long id);
-    void deleteById(Long id);
-    Chat save(Chat chat);
     ChatResponse addChat(Optional<MessengerUser> user, UserRequest request);
-    void updateAll(Iterable<Chat> chats);
-    List<Chat> findAllByIdFirst(MessengerUser user);
-    List<Chat> findAllByIdSecond(MessengerUser user);
-
+    List<Chat> findChats(MessengerUser user);
+    Chat findChat(MessengerUser user, MessengerUser user2);
 }

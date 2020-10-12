@@ -28,26 +28,6 @@ public class ChatService implements ChatOperations {
     }
 
     @Override
-    public Iterable<Chat> findAll() {
-        return chatRepository.findAll();
-    }
-
-    @Override
-    public Optional<Chat> findById(Long id) {
-        return chatRepository.findById(id);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        chatRepository.deleteById(id);
-    }
-
-    @Override
-    public Chat save(Chat chat) {
-        return chatRepository.save(chat);
-    }
-
-    @Override
     public ChatResponse addChat(Optional<MessengerUser> user, UserRequest request) {
         MessengerUser msgUser = user.get();
         Optional<MessengerUser> secondUser = userRepository.findByUsername(request.getUsername());
@@ -65,43 +45,24 @@ public class ChatService implements ChatOperations {
                 chat.setFirstUser(msgUser);
                 chat.setSecondUser(secondUser.get());
                 chatRepository.save(chat);
-                ChatResponse resp = new ChatResponse(chat.getId(), chat.getFirstUser().getUsername(), chat.getSecondUser().getUsername());
-                return resp;
+
+                return new ChatResponse(chat.getId(), chat.getFirstUser().getUsername(), chat.getSecondUser().getUsername());
             }
         }
         return null;
     }
 
     @Override
-    public void updateAll(Iterable<Chat> chats) {
-        chatRepository.saveAll(chats);
-    }
-
-    @Override
-    public List<Chat> findAllByIdFirst(MessengerUser user) {
-        return chatRepository.findChatsByFirstUser(user);
-    }
-
-    @Override
-    public List<Chat> findAllByIdSecond(MessengerUser user) {
-        return chatRepository.findChatsBySecondUser(user);
-    }
-
     public List<Chat> findChats(MessengerUser user){
-        List<Chat> chats = Stream.of(findAllByIdFirst(user), findAllByIdSecond(user
+        return Stream.of(chatRepository.findChatsByFirstUser(user), chatRepository.findChatsBySecondUser(user
         ))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
-        return chats;
     }
 
-//    @Override
-//    public Optional<Chat> findByIdFirst(Long id) {
-//        return chatRepository.findById_first(id);
-//    }
-//
-//    @Override
-//    public Optional<Chat> findByIdSecond(Long id) {
-//        return chatRepository.findById_second(id);
-//    }
+    @Override
+    public Chat findChat(MessengerUser user, MessengerUser user2){
+        return chatRepository.findChatByFirstUserAndSecondUser(user, user2);
+    }
+
 }

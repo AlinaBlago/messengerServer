@@ -19,26 +19,6 @@ public class RoleService implements RoleOperations {
     }
 
     @Override
-    public Optional<Role> findById(Long id) {
-        return roleRepository.findById(id);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        roleRepository.deleteById(id);
-    }
-
-    @Override
-    public Long save(Role role) {
-        return roleRepository.save(role).getId();
-    }
-
-    @Override
-    public void updateAll(Iterable<Role> roles) {
-        roleRepository.saveAll(roles);
-    }
-
-    @Override
     public Optional<Role> findByName(ERole name) {
         return roleRepository.findByName(name);
     }

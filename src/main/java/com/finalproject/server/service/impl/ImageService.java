@@ -12,37 +12,10 @@ import java.util.Optional;
 @Service
 @Transactional
 public class ImageService implements ImageOperations {
-
     private final ImageRepository imageRepository;
 
     public ImageService(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
     }
-
-    @Override
-    public Iterable<Image> findAll() {
-        return imageRepository.findAll();
-    }
-
-    @Override
-    public Optional<Image> findImageById(Long id) {
-        return imageRepository.findById(id);
-    }
-
-    @Override
-    public void deleteImageById(Long id) {
-        imageRepository.deleteById(id);
-    }
-
-    @Override
-    public Long save(Image image) {
-        return imageRepository.save(image).getId();
-    }
-
-    @Override
-    public void updateAll(Iterable<Image> images) {
-        imageRepository.saveAll(images);
-    }
-
 
 }

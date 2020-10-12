@@ -1,5 +1,6 @@
 package com.finalproject.server.controller;
 
+import com.finalproject.server.entity.ERole;
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.*;
@@ -7,6 +8,7 @@ import com.finalproject.server.payload.response.FindUserResponse;
 import com.finalproject.server.payload.response.UserResponse;
 
 import com.finalproject.server.repository.UserRepository;
+import com.finalproject.server.service.RoleOperations;
 import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
 import com.finalproject.server.service.impl.UserService;
@@ -18,23 +20,23 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
     private final UserOperations userOperations;
     private final UserRepository userRepository;
     private final TokenOperations tokenOperations;
     private final UserService userService;
+    private final RoleOperations roleOperations;
 
-    public UserController(UserOperations userOperations, UserRepository userRepository, TokenOperations tokenOperations, UserService userService) {
+    public UserController(UserOperations userOperations, UserRepository userRepository, TokenOperations tokenOperations, UserService userService, RoleOperations roleOperations) {
         this.userOperations = userOperations;
         this.userRepository = userRepository;
         this.tokenOperations = tokenOperations;
         this.userService = userService;
+        this.roleOperations = roleOperations;
     }
 
     @PostMapping
@@ -83,7 +85,7 @@ public class UserController {
     @PostMapping(value = "/find")
     public FindUserResponse findUser(@RequestBody UserRequest request){
 
-        List<MessengerUser> users = userRepository.findMessengerUsersByUsernameIsStartingWith(request.getUsername());
+        List<MessengerUser> users = userRepository.findMessengerUsersByUsernameIsStartingWithAndAndRolesEquals(request.getUsername(), roleOperations.findByName(ERole.ROLE_USER).get());
 
         ArrayList<String> usernames = new ArrayList<>();
         users.forEach(user ->{

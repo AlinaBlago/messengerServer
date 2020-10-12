@@ -8,9 +8,7 @@ import com.finalproject.server.payload.request.UserRequest;
 import java.util.Optional;
 
 public interface TokenOperations {
-    Optional<Token> findById(Long id);
     void deleteById(Long id);
-    void updateAll(Iterable<Token> tokens);
     String add(UserRequest request);
     String add(MessengerUser user, GetTokenForUpdateEmailRequest request);
     Token findByValue(String value);

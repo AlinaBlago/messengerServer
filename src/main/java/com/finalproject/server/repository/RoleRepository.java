@@ -16,7 +16,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     Set<ERole> ADMIN_AUTHORITIES = EnumSet.of(ERole.ROLE_USER, ERole.ROLE_ADMIN);
 
     Stream<Role> findAllByNameIn(Set<ERole> names);
-    void deleteByMessengerUsers(MessengerUser user);
+
 
 
 }

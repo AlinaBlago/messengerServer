@@ -58,7 +58,6 @@ public class UserService implements UserOperations, UserDetailsService {
                 .orElseThrow(() -> MessengerExceptions.userNotFound(username));
         return UserResponse.fromUser(updateCurrentUserPassword(user, request));
 
-
     }
 
     @Override
@@ -127,30 +126,25 @@ public class UserService implements UserOperations, UserDetailsService {
 
     }
 
-    private MessengerUser getUser(long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> MessengerExceptions.userNotFound(id));
-    }
-
     private MessengerUser updateCurrentUserLogin(MessengerUser user, UpdateUserLoginRequest request) {
         String username = request.getUsername();
-
         if (userRepository.existsByUsername(username)) throw MessengerExceptions.duplicateNickname(username);
-
         user.setUsername(username);
+
         return userRepository.save(user);
     }
+
     private MessengerUser updateCurrentUserPassword(MessengerUser user, UpdateUserPasswordRequest request) {
         String password = request.getPassword();
-
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw MessengerExceptions.wrongPassword();
         }
-
         user.setPassword(passwordEncoder.encode(password));
+
         return userRepository.save(user);
     }
 
+    @Override
     public void updateForgottenPassword(ChangePasswordRequest request) {
         Optional<MessengerUser> user = userRepository.findByUsername(request.getUsername());
         Token token = tokenOperations.findByValue(request.getToken());

@@ -19,26 +19,6 @@ public class StateService implements StateOperations {
     }
 
     @Override
-    public Optional<State> findById(Long id) {
-        return stateRepository.findById(id);
-    }
-
-    @Override
-    public void deleteById(Long id) {
-        stateRepository.deleteById(id);
-    }
-
-    @Override
-    public Long save(State state) {
-        return stateRepository.save(state).getId();
-    }
-
-    @Override
-    public void updateAll(Iterable<State> states) {
-        stateRepository.saveAll(states);
-    }
-
-    @Override
     public Optional<State> findByName(EState name) {
         return stateRepository.findByName(name);
     }

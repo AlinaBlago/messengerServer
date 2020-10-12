@@ -42,7 +42,7 @@ public class MessengerUser {
     private OffsetDateTime createdAt;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "id_user"),
@@ -53,7 +53,7 @@ public class MessengerUser {
     private Map<ERole, Role> roles = new EnumMap<>(ERole.class);
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_states",
             joinColumns = @JoinColumn(name = "id_user"),
