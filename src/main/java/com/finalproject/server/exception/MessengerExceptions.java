@@ -21,29 +21,12 @@ public class MessengerExceptions {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, "User with email " + email + " not found");
     }
 
-    public static ResponseStatusException userNotFound(long id) {
-        return new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id " + id + " not found");
-    }
-
-
     public static ResponseStatusException duplicateEmail(String email) {
         return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email " + email + " already taken");
     }
 
     public static ResponseStatusException duplicateNickname(String nickname) {
         return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nickname " + nickname + " already taken");
-    }
-
-    public static ResponseStatusException fileNotFound(Long id) {
-        return new ResponseStatusException(HttpStatus.NOT_FOUND, "File with id " + id + " not found");
-    }
-
-    public static ResponseStatusException emptyFile() {
-        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty");
-    }
-
-    public static ResponseStatusException storageOperationFailed(IOException cause) {
-        return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "File storage operation failed", cause);
     }
 
     public static ResponseStatusException wrongPassword() {

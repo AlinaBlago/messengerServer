@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatOperations {
-    ChatResponse addChat(Optional<MessengerUser> user, UserRequest request);
+    ChatResponse addChat(MessengerUser user, UserRequest request);
     List<Chat> findChats(MessengerUser user);
     Chat findChat(MessengerUser user, MessengerUser user2);
 }

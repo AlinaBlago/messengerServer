@@ -28,21 +28,20 @@ public class ChatService implements ChatOperations {
     }
 
     @Override
-    public ChatResponse addChat(Optional<MessengerUser> user, UserRequest request) {
-        MessengerUser msgUser = user.get();
+    public ChatResponse addChat(MessengerUser user, UserRequest request) {
         Optional<MessengerUser> secondUser = userRepository.findByUsername(request.getUsername());
 
         if (secondUser.isPresent()) {
-            var leftList = chatRepository.findChatsByFirstUser(msgUser);
+            var leftList = chatRepository.findChatsByFirstUser(user);
             leftList.retainAll(chatRepository.findChatsBySecondUser(secondUser.get()));
 
             var swapLeftList = chatRepository.findChatsByFirstUser(secondUser.get());
-            swapLeftList.retainAll(chatRepository.findChatsBySecondUser(msgUser));
+            swapLeftList.retainAll(chatRepository.findChatsBySecondUser(user));
 
             if (leftList.size() == 0 && swapLeftList.size() == 0)
             {
                 Chat chat = new Chat();
-                chat.setFirstUser(msgUser);
+                chat.setFirstUser(user);
                 chat.setSecondUser(secondUser.get());
                 chatRepository.save(chat);
 

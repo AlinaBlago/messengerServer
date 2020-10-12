@@ -32,13 +32,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final ObjectMapper objectMapper;
 
-
-
-
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTProperties jwtProperties, ObjectMapper objectMapper)
     {
-
-
         setAuthenticationManager(authenticationManager);
         setUsernameParameter("login");
 
@@ -69,7 +64,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         long now = System.currentTimeMillis();
         var principal = (UserDetails) auth.getPrincipal();
 
-
         String token = JWT.create()
                 .withSubject(principal.getUsername())
                 .withIssuedAt(new Date(now))
@@ -81,27 +75,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         res.addHeader(HttpHeaders.AUTHORIZATION, SecurityConstants.AUTH_TOKEN_PREFIX + token);
     }
-
-//    public void check(UserDetails user) {
-//        if (!user.isAccountNonLocked()) {
-//            logger.debug("User account is locked");
-//            throw new LockedException(messages.getMessage(
-//                    "AbstractUserDetailsAuthenticationProvider.locked",
-//                    "User account is locked"));
-//        }
-//        if (!user.isEnabled()) {
-//            logger.debug("User account is disabled");
-//            throw new DisabledException(messages.getMessage(
-//                    "AbstractUserDetailsAuthenticationProvider.disabled",
-//                    "User is disabled"));
-//        }
-//        if (!user.isAccountNonExpired()) {
-//            logger.debug("User account is expired");
-//            throw new AccountExpiredException(messages.getMessage(
-//                    "AbstractUserDetailsAuthenticationProvider.expired",
-//                    "User account has expired"));
-//        }
-//    }
 }
 
 

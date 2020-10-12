@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserService implements UserOperations, UserDetailsService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
@@ -78,13 +77,7 @@ public class UserService implements UserOperations, UserDetailsService {
     public UserDetails deleteByUsername(String username) throws UsernameNotFoundException {
         MessengerUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
-
         user.setStates(getDeletedUserStates());
-//        List<Chat> chats = chatRepository.findChatsByFirstUser(user);
-//        for (Chat chat: chats) {
-//            messageRepository.deleteMessagesByChat(chat);
-//
-//        }
 
         try{
             return loadUserByUsername(username);
@@ -117,13 +110,11 @@ public class UserService implements UserOperations, UserDetailsService {
     public UserDetails unLockByUsername(UserRequest request) throws UsernameNotFoundException {
         MessengerUser user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User " + request.getUsername() + " not found"));
-
         user.setStates(getUnactiveUserStates());
-
         user.setEnabled(true);
         userRepository.save(user);
-        return loadUserByUsername(request.getUsername());
 
+        return loadUserByUsername(request.getUsername());
     }
 
     private MessengerUser updateCurrentUserLogin(MessengerUser user, UpdateUserLoginRequest request) {
@@ -146,15 +137,15 @@ public class UserService implements UserOperations, UserDetailsService {
 
     @Override
     public void updateForgottenPassword(ChangePasswordRequest request) {
-        Optional<MessengerUser> user = userRepository.findByUsername(request.getUsername());
+        MessengerUser user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> MessengerExceptions.userNotFound(""));
         Token token = tokenOperations.findByValue(request.getToken());
 
-        if (tokenOperations.findByValueAndUser(token.getValue(), user.get()).isPresent()) {
+        if (tokenOperations.findByValueAndUser(token.getValue(), user).isPresent()) {
                 String password = request.getPassword();
                 if (password != null) {
-                    user.get().setPassword(passwordEncoder.encode(password));
-                    tokenOperations.deleteById(tokenOperations.findByValueAndUser(token.getValue(), user.get()).get().getId());
-                    userRepository.save(user.get());
+                    user.setPassword(passwordEncoder.encode(password));
+                    tokenOperations.deleteById(tokenOperations.findByValueAndUser(token.getValue(), user).get().getId());
+                    userRepository.save(user);
                 }
         }
     }

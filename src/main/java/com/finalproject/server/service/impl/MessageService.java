@@ -4,6 +4,7 @@ package com.finalproject.server.service.impl;
 import com.finalproject.server.entity.Chat;
 import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.MessengerUser;
+import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.SendMessageRequest;
 import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.response.MessageResponse;
@@ -66,25 +67,21 @@ public class MessageService implements MessageOperations {
     }
 
     @Override
-    public List<Message> loadChat(Optional<MessengerUser> user, UserRequest request) {
-        Optional<MessengerUser> companion = userRepository.findByUsername(request.getUsername());
+    public List<Message> loadChat(MessengerUser user, UserRequest request) {
+        MessengerUser companion = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> MessengerExceptions.userNotFound(""));
 
         List<Message> messages = null;
-        if(companion.isPresent()){
-            MessengerUser u1 = user.get();
-            MessengerUser u2 = companion.get();
-            Chat chat = chatOperations.findChat(u1, u2);
-         //   Chat chat = chatRepository.findChatByFirstUserAndSecondUser(u1, u2);
+
+            Chat chat = chatOperations.findChat(user, companion);
 
             if(chat != null){
                 messages = messageRepository.findMessagesByChat(chat);
             }else{
-                chat = chatOperations.findChat(u2, u1);
+                chat = chatOperations.findChat(companion, user);
                 if(chat != null){
                     messages = messageRepository.findMessagesByChat(chat);
                 }
             }
-        }
 
         return messages;
     }

@@ -2,6 +2,7 @@ package com.finalproject.server.controller;
 
 import com.finalproject.server.entity.Message;
 import com.finalproject.server.entity.MessengerUser;
+import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.request.SendMessageRequest;
 import com.finalproject.server.payload.response.ChatResponse;
@@ -33,7 +34,8 @@ public class MessageController {
 
     @PostMapping(value = "/me/chats")
     public ResponseEntity<ChatResponse> addChat(@AuthenticationPrincipal String email, @RequestBody UserRequest request) {
-        ChatResponse response =  chatOperations.addChat(userRepository.findByUsername(email), request);
+        ChatResponse response =  chatOperations.addChat(userRepository.findByUsername(email)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(email)), request);
         if (response != null){
             return ResponseEntity.ok(response);
             } else {
@@ -45,7 +47,7 @@ public class MessageController {
     public List<ChatResponse> getUserChats(@AuthenticationPrincipal String email){
         List<ChatResponse> response = new ArrayList<>();
         Optional<MessengerUser> user = userRepository.findByUsername(email);
-        MessengerUser msgUser = user.get();
+        MessengerUser msgUser = user.orElseThrow(() -> MessengerExceptions.userNotFound(email));
         chatOperations.findChats(msgUser).forEach(chat -> {
             ChatResponse resp = new ChatResponse(chat.getId() , chat.getFirstUser().getUsername(), chat.getSecondUser().getUsername());
             response.add(resp);
@@ -56,15 +58,15 @@ public class MessageController {
 
     @PostMapping(value = "/me/messages")
     public MessageResponse sendMessage(@AuthenticationPrincipal String email, @RequestBody SendMessageRequest request) {
-        Message message = messageOperations.save(userRepository.findByUsername(email).get(), request);
-        MessageResponse resp = new MessageResponse(message);
+        Message message = messageOperations.save(userRepository.findByUsername(email).orElseThrow(() -> MessengerExceptions.userNotFound(email)), request);
 
-        return resp;
+        return new MessageResponse(message);
     }
 
     @PostMapping(value = "/me/chat")
     public ResponseEntity<List<MessageResponse>> getChat(@AuthenticationPrincipal String email, @RequestBody UserRequest request){
-        List<Message> messages = messageOperations.loadChat(userRepository.findByUsername(email), request);
+        List<Message> messages = messageOperations.loadChat(userRepository.findByUsername(email)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(email)), request);
 
         if (messages != null){
             List<MessageResponse> msgResp = new ArrayList<>();
@@ -79,7 +81,7 @@ public class MessageController {
 
     @GetMapping("/me/newMessages")
     public SseEmitter loadMessages(@AuthenticationPrincipal String email) {
-        MessengerUser user = userRepository.findByUsername(email).get();
+        MessengerUser user = userRepository.findByUsername(email).orElseThrow(() -> MessengerExceptions.userNotFound(email));
 
         return messageOperations.loadMessages(user);
     }

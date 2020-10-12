@@ -70,21 +70,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                // open static resources
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                // allow user registration
                 .antMatchers(HttpMethod.POST, "/users", "/password/**").permitAll()
-                // admin can register new admins
                 .antMatchers(HttpMethod.POST, "/users/admins/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PATCH, "/users/admins").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/users/admins/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.PATCH, "/users/me/**").hasRole("USER")
-
-                // regular users can view basic user info for other users
-                .antMatchers(HttpMethod.GET,"/users/{id:\\d+}").authenticated()
-                // admin can manage users by id
-                .antMatchers("/users/{id:\\d+}/**").hasRole("ADMIN")
-                // admin can use Actuator endpoints
                 .requestMatchers(EndpointRequest.toAnyEndpoint()).hasRole("ADMIN")
                 // by default, require authentication
                 .anyRequest().authenticated()

@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface MessageOperations {
 
     Message save(MessengerUser sender, SendMessageRequest request);
-    List<Message> loadChat(Optional<MessengerUser> user, UserRequest request);
-    public List<MessageResponse> getNewMessages(Chat chat, MessengerUser receiver);
-    public SseEmitter loadMessages(MessengerUser user);
+    List<Message> loadChat(MessengerUser user, UserRequest request);
+    List<MessageResponse> getNewMessages(Chat chat, MessengerUser receiver);
+    SseEmitter loadMessages(MessengerUser user);
 }

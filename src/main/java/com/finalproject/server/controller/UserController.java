@@ -70,14 +70,16 @@ public class UserController {
 
     @PostMapping(value = "/me/email", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> sendChangeEmailToken(@AuthenticationPrincipal String email, @RequestBody GetTokenForUpdateEmailRequest request) {
-        MessengerUser user = userRepository.findByUsername(email).get();
+        MessengerUser user = userRepository.findByUsername(email)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(email));
         String token = tokenOperations.add(user ,request);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping(value = "/me/email/change", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changePassword(@AuthenticationPrincipal String email, @RequestBody ChangeEmailRequest request) {
-        MessengerUser user = userRepository.findByUsername(email).get();
+        MessengerUser user = userRepository.findByUsername(email)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(email));
         userService.updateEmail(user, request);
         return ResponseEntity.ok("Email changed successful");
     }
@@ -85,7 +87,8 @@ public class UserController {
     @PostMapping(value = "/find")
     public FindUserResponse findUser(@RequestBody UserRequest request){
 
-        List<MessengerUser> users = userRepository.findMessengerUsersByUsernameIsStartingWithAndAndRolesEquals(request.getUsername(), roleOperations.findByName(ERole.ROLE_USER).get());
+        List<MessengerUser> users = userRepository.findMessengerUsersByUsernameIsStartingWithAndAndRolesEquals(request.getUsername(), roleOperations.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(request.getUsername())));
 
         ArrayList<String> usernames = new ArrayList<>();
         users.forEach(user ->{
