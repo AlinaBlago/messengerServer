@@ -86,14 +86,11 @@ public class UserController {
 
     @PostMapping(value = "/find")
     public FindUserResponse findUser(@RequestBody UserRequest request){
-
         List<MessengerUser> users = userRepository.findMessengerUsersByUsernameIsStartingWithAndAndRolesEquals(request.getUsername(), roleOperations.findByName(ERole.ROLE_USER)
                 .orElseThrow(() -> MessengerExceptions.userNotFound(request.getUsername())));
 
         ArrayList<String> usernames = new ArrayList<>();
-        users.forEach(user ->{
-            usernames.add(user.getUsername());
-        });
+        users.forEach(user -> usernames.add(user.getUsername()));
 
         return new FindUserResponse(usernames);
     }

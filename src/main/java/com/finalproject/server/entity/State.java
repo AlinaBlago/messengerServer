@@ -23,7 +23,7 @@ public class State {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "states")
-    private Set<MessengerUser> messengerUsers = new HashSet<MessengerUser>();
+    private Set<MessengerUser> messengerUsers = new HashSet<>();
 
     public State() {
     }

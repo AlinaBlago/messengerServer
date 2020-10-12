@@ -8,7 +8,6 @@ import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.SendMessageRequest;
 import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.response.MessageResponse;
-import com.finalproject.server.repository.ChatRepository;
 import com.finalproject.server.repository.MessageRepository;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.ChatOperations;
@@ -94,9 +93,7 @@ public class MessageService implements MessageOperations {
 
         try{
             List<MessageResponse> msgResp = new ArrayList<>();
-            messages.forEach(msg -> {
-                msgResp.add(new MessageResponse(msg)) ;
-            });
+            messages.forEach(msg -> msgResp.add(new MessageResponse(msg)));
             return msgResp;
         }
         finally {

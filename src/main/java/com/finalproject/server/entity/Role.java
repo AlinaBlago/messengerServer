@@ -1,8 +1,6 @@
 package com.finalproject.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -24,7 +22,7 @@ public class Role implements GrantedAuthority {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "roles", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<MessengerUser> messengerUsers = new HashSet<MessengerUser>();
+    private Set<MessengerUser> messengerUsers = new HashSet<>();
 
     public Role() {
     }

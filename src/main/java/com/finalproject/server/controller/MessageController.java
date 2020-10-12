@@ -70,9 +70,7 @@ public class MessageController {
 
         if (messages != null){
             List<MessageResponse> msgResp = new ArrayList<>();
-            messages.forEach(msg -> {
-                msgResp.add(new MessageResponse(msg));
-            });
+            messages.forEach(msg -> msgResp.add(new MessageResponse(msg)));
             return ResponseEntity.ok(msgResp);
         } else {
             return ResponseEntity.badRequest().body(null);

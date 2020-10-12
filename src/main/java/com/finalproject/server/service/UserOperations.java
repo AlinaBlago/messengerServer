@@ -2,7 +2,6 @@ package com.finalproject.server.service;
 
 import com.finalproject.server.payload.request.*;
 import com.finalproject.server.payload.response.UserResponse;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
@@ -17,13 +16,13 @@ public interface UserOperations {
 
     UserResponse create(SignupRequest request);
 
-    UserDetails deleteByUsername(String username) throws UsernameNotFoundException;
+    void deleteByUsername(String username) throws UsernameNotFoundException;
 
-    UserDetails lockByUsername(UserRequest request) throws UsernameNotFoundException;
+    void lockByUsername(UserRequest request) throws UsernameNotFoundException;
 
-    UserDetails unLockByUsername(UserRequest request) throws UsernameNotFoundException;
+    void unLockByUsername(UserRequest request) throws UsernameNotFoundException;
 
     UserResponse createAdmin(SignupRequest request);
 
-    public void updateForgottenPassword(ChangePasswordRequest request);
+    void updateForgottenPassword(ChangePasswordRequest request);
 }

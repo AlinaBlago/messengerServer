@@ -1,19 +1,15 @@
 package com.finalproject.server.controller;
 
-import com.finalproject.server.entity.ERole;
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.request.SignupRequest;
-import com.finalproject.server.payload.response.ChatResponse;
 import com.finalproject.server.payload.response.FindUserResponse;
 import com.finalproject.server.payload.response.UserResponse;
 import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.service.UserOperations;
-import com.finalproject.server.service.impl.ChatService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -52,9 +48,7 @@ public class AdminController {
     public FindUserResponse findUser(@RequestBody UserRequest request){
         List<MessengerUser> users = userRepository.findMessengerUsersByUsernameIsStartingWith(request.getUsername());
         ArrayList<String> usernames = new ArrayList<>();
-        users.forEach(user ->{
-            usernames.add(user.getUsername());
-        });
+        users.forEach(user -> usernames.add(user.getUsername()));
 
         return new FindUserResponse(usernames);
     }

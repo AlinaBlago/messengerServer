@@ -5,7 +5,6 @@ import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.response.ChangePasswordResponse;
 import com.finalproject.server.service.TokenOperations;
 import com.finalproject.server.service.UserOperations;
-import com.finalproject.server.service.impl.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

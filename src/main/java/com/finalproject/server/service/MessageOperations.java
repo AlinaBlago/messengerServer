@@ -9,7 +9,6 @@ import com.finalproject.server.payload.response.MessageResponse;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface MessageOperations {
 

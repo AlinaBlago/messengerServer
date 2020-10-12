@@ -3,8 +3,6 @@ package com.finalproject.server.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
-
 public class MessengerExceptions {
     private MessengerExceptions() {
     }

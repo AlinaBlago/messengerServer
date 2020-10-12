@@ -1,7 +1,6 @@
 package com.finalproject.server.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.finalproject.server.repository.UserRepository;
 import com.finalproject.server.security.filters.JWTAuthenticationFilter;
 import com.finalproject.server.security.filters.JWTAuthorizationFilter;
 import com.finalproject.server.security.properties.JWTProperties;

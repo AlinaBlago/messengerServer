@@ -74,13 +74,13 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public UserDetails deleteByUsername(String username) throws UsernameNotFoundException {
+    public void deleteByUsername(String username) throws UsernameNotFoundException {
         MessengerUser user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
         user.setStates(getDeletedUserStates());
 
         try{
-            return loadUserByUsername(username);
+            loadUserByUsername(username);
         }
         finally {
             user.setEnabled(false);
@@ -89,14 +89,14 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public UserDetails lockByUsername(UserRequest request) throws UsernameNotFoundException {
+    public void lockByUsername(UserRequest request) throws UsernameNotFoundException {
         MessengerUser user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User " + request.getUsername() + " not found"));
 
         user.setStates(getLockedUserStates());
 
         try {
-            return loadUserByUsername(request.getUsername());
+            loadUserByUsername(request.getUsername());
         }
         finally {
             user.setEnabled(false);
@@ -107,14 +107,14 @@ public class UserService implements UserOperations, UserDetailsService {
     }
 
     @Override
-    public UserDetails unLockByUsername(UserRequest request) throws UsernameNotFoundException {
+    public void unLockByUsername(UserRequest request) throws UsernameNotFoundException {
         MessengerUser user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User " + request.getUsername() + " not found"));
         user.setStates(getUnactiveUserStates());
         user.setEnabled(true);
         userRepository.save(user);
 
-        return loadUserByUsername(request.getUsername());
+        loadUserByUsername(request.getUsername());
     }
 
     private MessengerUser updateCurrentUserLogin(MessengerUser user, UpdateUserLoginRequest request) {

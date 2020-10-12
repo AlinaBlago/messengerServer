@@ -7,9 +7,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.annotation.PreDestroy;
-import java.io.IOException;
-
 @SpringBootApplication
 public class MessengerServerApplication implements WebMvcConfigurer{
 
