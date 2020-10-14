@@ -28,14 +28,12 @@ public class UserController {
     private final UserOperations userOperations;
     private final UserRepository userRepository;
     private final TokenOperations tokenOperations;
-    private final UserService userService;
     private final RoleOperations roleOperations;
 
-    public UserController(UserOperations userOperations, UserRepository userRepository, TokenOperations tokenOperations, UserService userService, RoleOperations roleOperations) {
+    public UserController(UserOperations userOperations, UserRepository userRepository, TokenOperations tokenOperations, RoleOperations roleOperations) {
         this.userOperations = userOperations;
         this.userRepository = userRepository;
         this.tokenOperations = tokenOperations;
-        this.userService = userService;
         this.roleOperations = roleOperations;
     }
 
@@ -51,6 +49,7 @@ public class UserController {
     }
 
     @PatchMapping("/me/login")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public UserResponse updateUsername(@AuthenticationPrincipal String email,
                                          @RequestBody @Valid UpdateUserLoginRequest request) {
         return userOperations.updateUsername(email, request);
@@ -70,17 +69,14 @@ public class UserController {
 
     @PostMapping(value = "/me/email", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> sendChangeEmailToken(@AuthenticationPrincipal String email, @RequestBody GetTokenForUpdateEmailRequest request) {
-        MessengerUser user = userRepository.findByUsername(email)
-                .orElseThrow(() -> MessengerExceptions.userNotFound(email));
-        String token = tokenOperations.add(user ,request);
+        String token = tokenOperations.add(email ,request);
         return ResponseEntity.ok(token);
     }
 
     @PostMapping(value = "/me/email/change", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changePassword(@AuthenticationPrincipal String email, @RequestBody ChangeEmailRequest request) {
-        MessengerUser user = userRepository.findByUsername(email)
-                .orElseThrow(() -> MessengerExceptions.userNotFound(email));
-        userService.updateEmail(user, request);
+    public ResponseEntity<?> changeEmail(@AuthenticationPrincipal String email, @RequestBody ChangeEmailRequest request) {
+
+        userOperations.updateEmail(email, request);
         return ResponseEntity.ok("Email changed successful");
     }
 

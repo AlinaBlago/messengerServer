@@ -2,6 +2,7 @@ package com.finalproject.server.payload.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 
 public class ChangeEmailRequest {
     @NotBlank
@@ -35,4 +36,17 @@ public class ChangeEmailRequest {
         this.email = email;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChangeEmailRequest)) return false;
+        ChangeEmailRequest that = (ChangeEmailRequest) o;
+        return token.equals(that.token) &&
+                email.equals(that.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(token, email);
+    }
 }

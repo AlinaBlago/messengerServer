@@ -3,6 +3,7 @@ package com.finalproject.server.payload.request;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 
 public class LoginRequest {
     @NotBlank
@@ -37,4 +38,17 @@ public class LoginRequest {
         this.password = password;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LoginRequest)) return false;
+        LoginRequest request = (LoginRequest) o;
+        return username.equals(request.username) &&
+                password.equals(request.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, password);
+    }
 }

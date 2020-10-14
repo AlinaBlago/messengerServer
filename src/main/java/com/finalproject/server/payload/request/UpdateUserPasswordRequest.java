@@ -1,5 +1,7 @@
 package com.finalproject.server.payload.request;
 
+import java.util.Objects;
+
 public class UpdateUserPasswordRequest {
     private String oldPassword;
     private String password;
@@ -26,6 +28,20 @@ public class UpdateUserPasswordRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UpdateUserPasswordRequest)) return false;
+        UpdateUserPasswordRequest that = (UpdateUserPasswordRequest) o;
+        return oldPassword.equals(that.oldPassword) &&
+                password.equals(that.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(oldPassword, password);
     }
 
     @Override

@@ -34,8 +34,7 @@ public class MessageController {
 
     @PostMapping(value = "/me/chats")
     public ResponseEntity<ChatResponse> addChat(@AuthenticationPrincipal String email, @RequestBody UserRequest request) {
-        ChatResponse response =  chatOperations.addChat(userRepository.findByUsername(email)
-                .orElseThrow(() -> MessengerExceptions.userNotFound(email)), request);
+        ChatResponse response =  chatOperations.addChat(email, request);
         if (response != null){
             return ResponseEntity.ok(response);
             } else {

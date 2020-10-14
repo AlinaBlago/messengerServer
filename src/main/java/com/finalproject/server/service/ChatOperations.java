@@ -8,7 +8,7 @@ import com.finalproject.server.payload.response.ChatResponse;
 import java.util.List;
 
 public interface ChatOperations {
-    ChatResponse addChat(MessengerUser user, UserRequest request);
+    ChatResponse addChat(String email, UserRequest request);
     List<Chat> findChats(MessengerUser user);
     Chat findChat(MessengerUser user, MessengerUser user2);
 }

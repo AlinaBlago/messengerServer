@@ -2,6 +2,7 @@ package com.finalproject.server.service.impl;
 
 import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.entity.Token;
+import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.mail.MailService;
 import com.finalproject.server.payload.request.GetTokenForUpdateEmailRequest;
 import com.finalproject.server.payload.request.UserRequest;
@@ -54,7 +55,10 @@ public class TokenService implements TokenOperations {
         }
 
     @Override
-    public String add(MessengerUser user, GetTokenForUpdateEmailRequest request) {
+    public String add(String email, GetTokenForUpdateEmailRequest request) {
+        MessengerUser user = userRepository.findByUsername(email)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(email));
+
         String token = CustomToken.getToken();
 
         Token userToken = new Token();

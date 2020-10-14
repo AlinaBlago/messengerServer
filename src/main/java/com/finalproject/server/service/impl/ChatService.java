@@ -2,6 +2,7 @@ package com.finalproject.server.service.impl;
 
 import com.finalproject.server.entity.Chat;
 import com.finalproject.server.entity.MessengerUser;
+import com.finalproject.server.exception.MessengerExceptions;
 import com.finalproject.server.payload.request.UserRequest;
 import com.finalproject.server.payload.response.ChatResponse;
 import com.finalproject.server.repository.ChatRepository;
@@ -28,7 +29,9 @@ public class ChatService implements ChatOperations {
     }
 
     @Override
-    public ChatResponse addChat(MessengerUser user, UserRequest request) {
+    public ChatResponse addChat(String email, UserRequest request) {
+       MessengerUser user = userRepository.findByUsername(email).get();
+
         Optional<MessengerUser> secondUser = userRepository.findByUsername(request.getUsername());
 
         if (secondUser.isPresent()) {

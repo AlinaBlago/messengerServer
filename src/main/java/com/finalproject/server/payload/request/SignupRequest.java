@@ -2,6 +2,7 @@ package com.finalproject.server.payload.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 import java.util.Set;
 
 public class SignupRequest {
@@ -63,5 +64,22 @@ public class SignupRequest {
 
     public void setState(Set<String> state) {
         this.state = state;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SignupRequest)) return false;
+        SignupRequest that = (SignupRequest) o;
+        return email.equals(that.email) &&
+                username.equals(that.username) &&
+                password.equals(that.password) &&
+                Objects.equals(role, that.role) &&
+                Objects.equals(state, that.state);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(email, username, password, role, state);
     }
 }

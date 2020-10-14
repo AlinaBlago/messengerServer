@@ -12,8 +12,6 @@ public class MessengerServerApplication implements WebMvcConfigurer{
 
     public static void main(String[] args)  {
         SpringApplication.run(MessengerServerApplication.class, args);
-      //userService.init();
-      //messageService.init();// // // }
 }
 
     @Override

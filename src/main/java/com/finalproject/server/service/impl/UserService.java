@@ -150,13 +150,15 @@ public class UserService implements UserOperations, UserDetailsService {
         }
     }
 
-    public void updateEmail(MessengerUser user, ChangeEmailRequest request) {
+    @Override
+    public void updateEmail(String email, ChangeEmailRequest request) {
+        MessengerUser user = userRepository.findByUsername(email)
+                .orElseThrow(() -> MessengerExceptions.userNotFound(email));
+
         Token token = tokenOperations.findByValue(request.getToken());
 
         if (tokenOperations.findByValueAndUser(token.getValue(), user).isPresent()) {
-            String email = request.getEmail();
-
-                user.setEmail(email);
+                user.setEmail(request.getEmail());
                 tokenOperations.deleteById(tokenOperations.findByValueAndUser(token.getValue(), user).get().getId());
                 userRepository.save(user);
 

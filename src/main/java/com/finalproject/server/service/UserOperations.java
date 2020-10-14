@@ -1,5 +1,6 @@
 package com.finalproject.server.service;
 
+import com.finalproject.server.entity.MessengerUser;
 import com.finalproject.server.payload.request.*;
 import com.finalproject.server.payload.response.UserResponse;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,8 @@ public interface UserOperations {
     UserResponse updatePassword(String email, UpdateUserPasswordRequest request);
 
     UserResponse create(SignupRequest request);
+
+    void updateEmail(String email, ChangeEmailRequest request);
 
     void deleteByUsername(String username) throws UsernameNotFoundException;
 

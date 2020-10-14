@@ -1,6 +1,7 @@
 package com.finalproject.server.payload.request;
 
 import javax.validation.constraints.NotBlank;
+import java.util.Objects;
 
 public class SendMessageRequest {
     @NotBlank
@@ -38,5 +39,19 @@ public class SendMessageRequest {
                 "receiver=" + receiver +
                 ", message='" + message + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SendMessageRequest)) return false;
+        SendMessageRequest request = (SendMessageRequest) o;
+        return receiver.equals(request.receiver) &&
+                message.equals(request.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(receiver, message);
     }
 }

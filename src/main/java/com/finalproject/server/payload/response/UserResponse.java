@@ -6,6 +6,7 @@ import com.finalproject.server.entity.MessengerUser;
 
 import java.time.OffsetDateTime;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class UserResponse {
@@ -74,4 +75,20 @@ public class UserResponse {
         this.roles = roles;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserResponse)) return false;
+        UserResponse response = (UserResponse) o;
+        return id == response.id &&
+                email.equals(response.email) &&
+                username.equals(response.username) &&
+                Objects.equals(createdAt, response.createdAt) &&
+                Objects.equals(roles, response.roles);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, username, createdAt, roles);
+    }
 }

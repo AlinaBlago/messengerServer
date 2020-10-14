@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface TokenOperations {
     void deleteById(Long id);
     String add(UserRequest request);
-    String add(MessengerUser user, GetTokenForUpdateEmailRequest request);
+    String add(String email, GetTokenForUpdateEmailRequest request);
     Token findByValue(String value);
     Optional<Token> findByValueAndUser(String token, MessengerUser messengerUser);
 }
